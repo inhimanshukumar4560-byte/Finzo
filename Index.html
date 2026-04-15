@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>The Academic Curator | Finzo</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        // PW THEME PALETTE: Replaced original colors with PW-inspired palette
+                        primary: "#283271", // PW Deep Blue
+                        secondary: "#FFD900", // PW Bright Yellow
+                        "secondary-container": "#FFD900", // Used for buttons
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#283271", // Text on yellow buttons
+                        background: "#f8fafc", // Kept a clean light background
+                        surface: "#ffffff",
+                        "surface-container-low": "#f3f4f6",
+                        "on-background": "#111827",
+                        "on-surface": "#111827",
+                        "on-surface-variant": "#4b5563",
+                        outline: "#d1d5db",
+                        "outline-variant": "#e5e7eb",
+
+                        // Supporting colors (minor adjustments for harmony)
+                        "primary-container": "#283271",
+                        "on-primary-container": "#e0e7ff",
+                        "secondary-fixed": "#FFD900",
+                        "on-secondary": "#283271",
+                        "primary-fixed": "#dbeafe",
+                        "on-primary-fixed": "#1e3a8a",
+                        "surface-tint": "#283271",
+
+                        // Unchanged functional colors
+                        error: "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.125rem",
+                        lg: "0.25rem",
+                        xl: "0.5rem",
+                        "2xl": "1rem",
+                        "3xl": "1.5rem",
+                        full: "9999px",
+                    },
+                    fontFamily: {
+                        headline: ["Plus Jakarta Sans", "sans-serif"],
+                        body: ["Inter", "sans-serif"],
+                        label: ["Inter", "sans-serif"],
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Refined, elegant shadow for professional look */
+        .editorial-shadow { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
+        .hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08); }
+        
+        body { min-height: max(884px, 100dvh); }
+        
+        /* Smooth Page Transition Animations */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .page { display: none; }
+        .page.active { 
+            display: block; 
+            animation: fadeSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+        }
+
+        /* Professional Nav Active State - PW THEME */
+        .bottom-nav-link { position: relative; }
+        .bottom-nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            background-color: #FFD900; /* PW Yellow */
+            border-radius: 4px;
+            transition: width 0.2s ease;
+        }
+        .bottom-nav-link.active-nav {
+            color: #283271; /* PW Blue */
+        }
+        .bottom-nav-link.active-nav::after {
+            width: 50%;
+        }
+        .bottom-nav-link.active-nav .material-symbols-outlined {
+            color: #283271; /* PW Blue */
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-body text-on-background antialiased pb-20">
+    <!-- TopAppBar -->
+    <header class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md flex items-center justify-between px-4 py-2.5 w-full border-b border-slate-200 shadow-sm transition-all">
+        <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-full bg-primary overflow-hidden border border-slate-200 shadow-sm">
+                <img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkfvkgQXG4DBLJeYAVcA2RkHJjSVjTBRrVr0COJGWvi-bFwFL2Vq9HstmSrTbu4eSb1tue76_Sv5sJ8HCEGa5U3moM7LxtIk4o5WdtvSP5Dx308ilhlht5Z963yEwTlb8o3fq8IOvMTE_0xOR614ymmFametWxD9Fy-6tC-rfkMa9MPGR2-m2dCe8LNDqEuAOXVzdeBgGJ3u9Cnvj_2qTTqJ-FTKkaKGkXHKZjwwUz5IsNpsSIbzQz1RISHnNKiAfcnvOObyUb464" />
+            </div>
+            <span class="text-lg font-bold text-primary tracking-tight font-headline">Finzo</span>
+        </div>
+        <button class="text-primary bg-slate-100 p-1.5 rounded-full transition-all hover:bg-slate-200 hover:text-blue-900 active:scale-95 flex items-center justify-center" onclick="showPage('notificationsPage')">
+            <span class="material-symbols-outlined text-[20px]">notifications</span>
+        </button>
+    </header>
+
+    <main id="main-content" class="mt-14 max-w-7xl mx-auto px-4 md:px-6">
+
+        <!-- ====================================================== -->
+        <!-- PAGE 1: HOME PAGE -->
+        <!-- ====================================================== -->
+        <div id="homePage" class="page active">
+            
+            <!-- 16:9 Framed Slider Section with Attached 3D Button -->
+            <div class="mb-8 mt-4 rounded-2xl bg-white border border-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.06)] overflow-hidden flex flex-col">
+                <!-- Frame around slider -->
+                <div class="p-2 bg-slate-50 border-b border-slate-100">
+                    <section class="relative w-full aspect-video rounded-xl overflow-hidden bg-[#e5e7eb] border border-slate-200 shadow-inner">
+                        <div id="hero-slider-track" class="flex w-full h-full">
+                            <!-- Slider images are wrapped in this container for Firebase injection -->
+                            <img src="https://i.ibb.co/HLRszFJP/file-000000001f9071fab4f51216ecc00b90.png" class="w-full h-full object-contain shrink-0" alt="Slide 1">
+                            <img src="https://i.ibb.co/TMHNyhwb/file-000000007dac71fab8a0a820533b815c.png" class="w-full h-full object-contain shrink-0" alt="Slide 2">
+                            <img src="https://i.ibb.co/tT0y9Wn4/file-00000000425471fab0e044b2e3c8039c.png" class="w-full h-full object-contain shrink-0" alt="Slide 3">
+                            <img src="https://i.ibb.co/cSnJX4Vz/file-00000000561871fabfc932291d04cc1c.png" class="w-full h-full object-contain shrink-0" alt="Slide 4">
+                        </div>
+                    </section>
+                </div>
+                
+                <!-- Attached 3D Button Container - PW THEME & WHATSAPP LINK ADDED -->
+                <div class="px-4 py-4 bg-white flex justify-center items-center">
+                    <a href="https://wa.me/919773464206" target="_blank" class="w-full max-w-sm bg-secondary text-on-secondary-container px-6 py-3.5 rounded-xl font-extrabold tracking-wide shadow-[0_5px_0_#e6c300,_0_8px_15px_rgba(255,217,0,0.4)] hover:shadow-[0_2px_0_#e6c300,_0_4px_8px_rgba(255,217,0,0.3)] hover:translate-y-[3px] transition-all duration-150 active:shadow-[0_0px_0_#e6c300] active:translate-y-[5px] flex items-center justify-center gap-2 text-[16px]">
+                        Book Free Counselling <span class="material-symbols-outlined text-[22px]">arrow_forward</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Why Choose Us -->
+            <section class="mb-8">
+                <div class="flex flex-col md:flex-row justify-between items-end mb-4 gap-2">
+                    <!-- IDs added for Firebase dynamic connection -->
+                    <h2 id="why-choose-us-title" class="font-headline text-2xl font-extrabold text-primary max-w-md tracking-tight">Why Professionals Trust Us</h2>
+                    <p id="why-choose-us-desc" class="text-on-surface-variant max-w-md text-xs leading-relaxed border-l-[3px] border-secondary pl-3">We provide world-class education focused on tangible career outcomes.</p>
+                </div>
+                <div id="why-choose-us-cards" class="flex overflow-x-auto gap-3 hide-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
+                    <div class="min-w-[200px] flex-1 bg-white border border-slate-200 p-4 rounded-xl hover-lift">
+                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-3 text-primary border border-blue-200"><span class="material-symbols-outlined text-lg">public</span></div>
+                        <h3 class="font-headline font-bold text-sm mb-1 text-primary">Global Recognition</h3>
+                        <p class="text-on-surface-variant text-[11px] leading-snug">Respected by top-tier firms across 170+ countries.</p>
+                    </div>
+                    <div class="min-w-[200px] flex-1 bg-white border border-slate-200 p-4 rounded-xl hover-lift">
+                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-3 text-primary border border-blue-200"><span class="material-symbols-outlined text-lg">verified_user</span></div>
+                        <h3 class="font-headline font-bold text-sm mb-1 text-primary">100% Placement</h3>
+                        <p class="text-on-surface-variant text-[11px] leading-snug">Dedicated career support for multinational roles.</p>
+                    </div>
+                    <div class="min-w-[200px] flex-1 bg-white border border-slate-200 p-4 rounded-xl hover-lift">
+                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-3 text-primary border border-blue-200"><span class="material-symbols-outlined text-lg">school</span></div>
+                        <h3 class="font-headline font-bold text-sm mb-1 text-primary">Expert Industry</h3>
+                        <p class="text-on-surface-variant text-[11px] leading-snug">Learn from real-world practitioner insights.</p>
+                    </div>
+                    <div class="min-w-[200px] flex-1 bg-white border border-slate-200 p-4 rounded-xl hover-lift">
+                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-3 text-primary border border-blue-200"><span class="material-symbols-outlined text-lg">star</span></div>
+                        <h3 class="font-headline font-bold text-sm mb-1 text-primary">Top Courses</h3>
+                        <p class="text-on-surface-variant text-[11px] leading-snug">Curated curriculum for the evolving job market.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Elevate Your Career Section - PW THEME & WHATSAPP LINK ADDED -->
+            <section class="relative rounded-2xl overflow-hidden mb-8 shadow-sm border border-slate-200/50">
+                <div class="absolute inset-0 bg-gradient-to-r from-primary via-primary/90 to-transparent z-10"></div>
+                <img alt="Hero" class="w-full h-[280px] md:h-[340px] object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuClG7YFXoUE1lO7hCmrLFZC8mjF2CBRz_we8Bsx7Mez3vU86JxBvI4GD2tRRRdc_g1bkll-1lK7gPWHWNV4_ZNV3-ki7XXB44dTOnmjT4a2XK1jR0hOrahGrsCcvNrjceuIu6gkHTEjpZkK1_I4eM_7ARq7k_0n9waSq_1N8tXuuA53JV3LxczHqdAB5S2xp26WZemY-dho9-L9n8GNeHDn0w9Kxt-YaD8tiF47CBh8h8bYlQc54fJLkwnJBrJwmMrII05HME2mZbE" />
+                <div class="absolute inset-0 z-20 flex flex-col justify-center px-6 md:px-10 max-w-2xl">
+                    <span class="inline-block w-fit bg-white/10 backdrop-blur-md border border-white/20 text-secondary font-label uppercase tracking-[0.2em] text-[10px] font-bold px-3 py-1 rounded-full mb-3">Elevate Your Career</span>
+                    <h1 class="text-white font-headline text-3xl md:text-5xl font-extrabold leading-[1.1] tracking-tight mb-5">
+                        Shape Your Future. <br /><span class="text-secondary">Master Your Profession.</span>
+                    </h1>
+                    <a href="https://wa.me/919773464206" target="_blank" class="w-fit bg-secondary-container text-on-secondary-container px-5 py-2.5 rounded-xl font-bold tracking-wide shadow-md hover:bg-yellow-300 transition-all active:scale-95 flex items-center gap-1.5 text-sm">
+                        Book Free Counselling <span class="material-symbols-outlined text-base">arrow_forward</span>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Popular Courses -->
+            <section class="mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="font-headline text-2xl font-extrabold text-primary tracking-tight">Popular Courses</h2>
+                    <button class="text-primary font-bold text-sm flex items-center gap-1 group px-2 py-1 rounded-md hover:bg-slate-200 transition-colors" onclick="showPage('coursesPage')">
+                        View All <span class="material-symbols-outlined text-xs group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    </button>
+                </div>
+                <div id="home-popular-courses" class="flex overflow-x-auto gap-4 hide-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0">
+                    <div class="min-w-[260px] bg-white border border-slate-200 rounded-xl overflow-hidden hover-lift flex flex-col">
+                        <div class="h-32 overflow-hidden relative">
+                            <img alt="CIA" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBub3qLzO2EfVQX0WJ6lr3GmPRIiimt1gnHitbjYaDUEPWcul9CLX2rCvzpaS0P0QBhen5CjwHJhLXyxqRmuzIp6e8SfgQIFgMAWj4UPjTakbpt8jVtEW4xRaj0uWd_JBszQAN69_5-4IPnNdAAx93fXL4cBrzgiNw48JYqJcVH6w8JQQQZnEfBFU8zKvmh9UXOqo6xgmEdOSYq_HLoPRGoJMzYUMBxCuuc7aiarxRT4K36r188eB5sHwoxm5XY2Kdm7xC7yOVq2js" />
+                            <div class="absolute top-2 left-2">
+                                <span class="text-[10px] font-bold text-primary bg-white px-2 py-1 rounded shadow-sm">Accounting</span>
+                            </div>
+                        </div>
+                        <div class="p-4 flex flex-col flex-grow">
+                            <h4 class="font-headline font-bold text-lg text-primary mb-2">CIA (Internal Audit)</h4>
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="flex items-center gap-1 text-xs font-medium text-slate-600"><span class="material-symbols-outlined text-[14px]">schedule</span> 12-18 Months</span>
+                                <span class="flex items-center gap-1 text-xs font-medium text-slate-600"><span class="material-symbols-outlined text-[14px]">group</span> 1.2k+ Students</span>
+                            </div>
+                            <div class="mt-auto pt-2 border-t border-slate-100 flex gap-2">
+                                <button class="w-full py-2 bg-slate-50 border border-slate-200 rounded-lg font-bold text-sm text-primary hover:bg-primary hover:text-white transition-colors duration-300" onclick="showPage('courseDetailsPage')">View Details</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="min-w-[260px] bg-white border border-slate-200 rounded-xl overflow-hidden hover-lift flex flex-col">
+                        <div class="h-32 overflow-hidden relative">
+                            <img alt="FRM" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiV2nCRNXb6WT5PGW6MdwvEY4yFGCkRSnUBj_j0cmdI51LNZ_WKbfONSti1uwkKZdvBtA3LTw_UzMGzyV_XAgX1qGypINFAQdjHJ97TyEvtx8spl43WF_3oFJLAN1y7Fr4H3aSshy5yigY8lKmVD8wytPRdKComa6d14l-TtkCNVdInPr4NFJqp4-sVN8BO2-K9S7hjGI1I5cwsnoo5mQoVE5WwX_nwQeGlFk4t2lHkbni7_6jNNAG-BKctdrMuwWMK-wnkRlDH4Y" />
+                            <div class="absolute top-2 left-2">
+                                <span class="text-[10px] font-bold text-primary bg-white px-2 py-1 rounded shadow-sm">Risk Mgmt</span>
+                            </div>
+                        </div>
+                        <div class="p-4 flex flex-col flex-grow">
+                            <h4 class="font-headline font-bold text-lg text-primary mb-2">FRM (Financial Risk)</h4>
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="flex items-center gap-1 text-xs font-medium text-slate-600"><span class="material-symbols-outlined text-[14px]">schedule</span> Part I & II</span>
+                                <span class="flex items-center gap-1 text-xs font-medium text-slate-600"><span class="material-symbols-outlined text-[14px]">group</span> 850+ Students</span>
+                            </div>
+                            <div class="mt-auto pt-2 border-t border-slate-100 flex gap-2">
+                                <button class="w-full py-2 bg-slate-50 border border-slate-200 rounded-lg font-bold text-sm text-primary hover:bg-primary hover:text-white transition-colors duration-300" onclick="showPage('courseDetailsPage')">View Details</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="min-w-[260px] bg-white border border-slate-200 rounded-xl overflow-hidden hover-lift flex flex-col">
+                        <div class="h-32 overflow-hidden relative">
+                            <img alt="US CMA" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZ8kqa7U62X_EsMK88aGP3D-O6SxiIYxLC76qKsMc6b_8oCsJDLXZvcYtTyzdEVGK6_wnBswTjadR1NJG01DNZL7oJkiT794lrsFFxk1q3Rc-wt3puhujkUgi4-dF4LEfSQ1oLu9TqFCssPFXt7Tklv8QWlTsgK384qrDNy3OL0UflfxovcoPEuGczaXjwJJZzTDq2OutDH-BcE2IDQ2qk6_3UALGvPhopzTRvLg8iQBuFWbeCe9Q44vF2Udp9H5wpwdJAMgPpUVM" />
+                             <div class="absolute top-2 left-2">
+                                <span class="text-[10px] font-bold text-primary bg-white px-2 py-1 rounded shadow-sm">Management</span>
+                            </div>
+                        </div>
+                        <div class="p-4 flex flex-col flex-grow">
+                            <h4 class="font-headline font-bold text-lg text-primary mb-2">US CMA (Cost Mgmt)</h4>
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="flex items-center gap-1 text-xs font-medium text-slate-600"><span class="material-symbols-outlined text-[14px]">schedule</span> 6-9 Months</span>
+                                <span class="flex items-center gap-1 text-xs font-medium text-slate-600"><span class="material-symbols-outlined text-[14px]">group</span> 2k+ Students</span>
+                            </div>
+                            <div class="mt-auto pt-2 border-t border-slate-100 flex gap-2">
+                                <button class="w-full py-2 bg-slate-50 border border-slate-200 rounded-lg font-bold text-sm text-primary hover:bg-primary hover:text-white transition-colors duration-300" onclick="showPage('courseDetailsPage')">View Details</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Webinar Highlight Banner - PW THEME & WHATSAPP LINK ADDED -->
+            <section class="mb-8" id="home-highlight-webinar">
+                <div class="bg-primary-container rounded-xl p-5 md:p-8 relative overflow-hidden text-white shadow-md border border-primary/20">
+                    <div class="absolute right-[-10%] top-[-20%] w-1/2 h-[140%] opacity-5 transform rotate-12 pointer-events-none">
+                        <span class="material-symbols-outlined text-[200px]" style="font-variation-settings: 'FILL' 1;">video_camera_front</span>
+                    </div>
+                    <div class="relative z-10">
+                        <div class="inline-flex items-center gap-1.5 bg-yellow-400 rounded px-2 py-1 mb-4 shadow-sm">
+                            <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>
+                            <span class="text-[9px] font-bold uppercase tracking-widest text-primary">Live Webinar</span>
+                        </div>
+                        <h2 class="font-headline text-2xl md:text-3xl font-extrabold mb-4 max-w-xl leading-tight">Crack the CIA Exam in Your First Attempt</h2>
+                        <div class="flex flex-wrap gap-4 mb-5">
+                            <div class="flex flex-col">
+                                <span class="text-on-primary-container text-[10px] font-bold uppercase tracking-wider mb-1">Starting In</span>
+                                <div class="flex gap-1.5">
+                                    <div class="bg-white/10 border border-white/20 backdrop-blur-md px-2 py-1.5 rounded-lg text-center min-w-[40px] shadow-inner"><span class="block text-lg font-black leading-none">02</span><span class="text-[8px] font-bold uppercase tracking-wider opacity-80 mt-0.5 block">Days</span></div>
+                                    <div class="bg-white/10 border border-white/20 backdrop-blur-md px-2 py-1.5 rounded-lg text-center min-w-[40px] shadow-inner"><span class="block text-lg font-black leading-none">14</span><span class="text-[8px] font-bold uppercase tracking-wider opacity-80 mt-0.5 block">Hrs</span></div>
+                                    <div class="bg-white/10 border border-white/20 backdrop-blur-md px-2 py-1.5 rounded-lg text-center min-w-[40px] shadow-inner"><span class="block text-lg font-black leading-none">35</span><span class="text-[8px] font-bold uppercase tracking-wider opacity-80 mt-0.5 block">Min</span></div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 border-l border-white/20 pl-4">
+                                <div class="w-8 h-8 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-white"><span class="material-symbols-outlined text-[18px]">calendar_month</span></div>
+                                <div><span class="block font-bold text-sm text-white leading-tight">Nov 28, 2024</span><span class="text-[11px] font-medium text-on-primary-container">7:00 PM IST</span></div>
+                            </div>
+                        </div>
+                        <a href="https://wa.me/919773464206" target="_blank" class="bg-secondary-container hover:bg-yellow-300 text-on-secondary-container px-5 py-2.5 rounded-lg font-bold transition-all shadow-md active:scale-95 text-sm inline-block">Secure Free Spot</a>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Quick Enquiry - UPDATED LINKS -->
+            <section class="mb-6 bg-white border border-slate-200 shadow-sm p-5 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="max-w-md text-center md:text-left">
+                    <h2 class="font-headline text-xl font-extrabold text-primary mb-1">Speak to an Advisor</h2>
+                    <p class="text-slate-600 text-xs">Counselors ready to help map out your professional growth.</p>
+                </div>
+                <div class="flex flex-row gap-2 w-full md:w-auto">
+                    <a class="flex-1 flex items-center justify-center gap-1 bg-primary text-white px-4 py-2.5 rounded-lg font-bold transition-all hover:bg-opacity-90 shadow-sm text-xs" href="tel:9773464206">
+                        <span class="material-symbols-outlined text-[16px]">call</span> Call Us
+                    </a>
+                    <a class="flex-1 flex items-center justify-center gap-1 bg-[#25D366] text-white px-4 py-2.5 rounded-lg font-bold transition-all hover:bg-[#20b858] shadow-sm text-xs" href="https://wa.me/919773464206" target="_blank">
+                        <span class="material-symbols-outlined text-[16px]">chat</span> WhatsApp
+                    </a>
+                </div>
+            </section>
+        </div>
+
+        <!-- ====================================================== -->
+        <!-- PAGE 2: ALL COURSES PAGE -->
+        <!-- ====================================================== -->
+        <div id="coursesPage" class="page">
+            <div class="mb-4 text-center md:text-left mt-2">
+                <h1 class="font-headline text-3xl font-extrabold text-primary mb-1 tracking-tight">Academic Programs</h1>
+                <p class="text-slate-600 text-xs max-w-lg">Find the perfect professional certification to accelerate your career growth.</p>
+            </div>
+
+            <!-- Search and Filter -->
+            <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 mb-6">
+                <div class="relative flex-grow">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+                    <input type="text" placeholder="Search for certification..." class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-secondary/50 focus:border-secondary transition-all text-primary font-medium" />
+                </div>
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar">
+                    <button class="px-4 py-2 bg-primary text-white font-bold rounded-lg text-xs whitespace-nowrap shadow-sm">All Programs</button>
+                    <button class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs whitespace-nowrap transition-colors border border-slate-200">Finance</button>
+                    <button class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs whitespace-nowrap transition-colors border border-slate-200">Audit</button>
+                    <button class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs whitespace-nowrap transition-colors border border-slate-200">Management</button>
+                </div>
+            </div>
+
+            <!-- Course Grid -->
+            <div id="all-courses-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                <!-- Course Cards Repetition Styled Professionally -->
+                <div class="bg-white border border-slate-200 rounded-xl overflow-hidden hover-lift flex flex-col cursor-pointer" onclick="showPage('courseDetailsPage')">
+                    <div class="h-32 overflow-hidden relative">
+                        <img alt="CIA" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBub3qLzO2EfVQX0WJ6lr3GmPRIiimt1gnHitbjYaDUEPWcul9CLX2rCvzpaS0P0QBhen5CjwHJhLXyxqRmuzIp6e8SfgQIFgMAWj4UPjTakbpt8jVtEW4xRaj0uWd_JBszQAN69_5-4IPnNdAAx93fXL4cBrzgiNw48JYqJcVH6w8JQQQZnEfBFU8zKvmh9UXOqo6xgmEdOSYq_HLoPRGoJMzYUMBxCuuc7aiarxRT4K36r188eB5sHwoxm5XY2Kdm7xC7yOVq2js" />
+                        <div class="absolute top-2 left-2">
+                            <span class="text-[10px] font-bold text-primary bg-white px-2 py-1 rounded shadow-sm">Accounting</span>
+                        </div>
+                    </div>
+                    <div class="p-4 flex flex-col flex-grow">
+                        <h4 class="font-headline font-bold text-lg text-primary mb-1">CIA (Internal Audit)</h4>
+                        <p class="text-xs text-slate-600 mb-4 leading-snug flex-grow">The gold standard in internal auditing globally. Master risk, governance, and control.</p>
+                        <button class="w-full py-2 bg-slate-50 border border-slate-200 rounded-lg font-bold text-sm text-primary hover:bg-primary hover:text-white transition-colors duration-300">Program Details</button>
+                    </div>
+                </div>
+                 <div class="bg-white border border-slate-200 rounded-xl overflow-hidden hover-lift flex flex-col cursor-pointer" onclick="showPage('courseDetailsPage')">
+                    <div class="h-32 overflow-hidden relative">
+                        <img alt="FRM" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiV2nCRNXb6WT5PGW6MdwvEY4yFGCkRSnUBj_j0cmdI51LNZ_WKbfONSti1uwkKZdvBtA3LTw_UzMGzyV_XAgX1qGypINFAQdjHJ97TyEvtx8spl43WF_3oFJLAN1y7Fr4H3aSshy5yigY8lKmVD8wytPRdKComa6d14l-TtkCNVdInPr4NFJqp4-sVN8BO2-K9S7hjGI1I5cwsnoo5mQoVE5WwX_nwQeGlFk4t2lHkbni7_6jNNAG-BKctdrMuwWMK-wnkRlDH4Y" />
+                        <div class="absolute top-2 left-2">
+                            <span class="text-[10px] font-bold text-primary bg-white px-2 py-1 rounded shadow-sm">Risk Mgmt</span>
+                        </div>
+                    </div>
+                    <div class="p-4 flex flex-col flex-grow">
+                        <h4 class="font-headline font-bold text-lg text-primary mb-1">FRM (Financial Risk)</h4>
+                        <p class="text-xs text-slate-600 mb-4 leading-snug flex-grow">Become a certified expert in identifying, analyzing, and mitigating financial risk.</p>
+                        <button class="w-full py-2 bg-slate-50 border border-slate-200 rounded-lg font-bold text-sm text-primary hover:bg-primary hover:text-white transition-colors duration-300">Program Details</button>
+                    </div>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-xl overflow-hidden hover-lift flex flex-col cursor-pointer" onclick="showPage('courseDetailsPage')">
+                    <div class="h-32 overflow-hidden relative">
+                        <img alt="US CMA" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZ8kqa7U62X_EsMK88aGP3D-O6SxiIYxLC76qKsMc6b_8oCsJDLXZvcYtTyzdEVGK6_wnBswTjadR1NJG01DNZL7oJkiT794lrsFFxk1q3Rc-wt3puhujkUgi4-dF4LEfSQ1oLu9TqFCssPFXt7Tklv8QWlTsgK384qrDNy3OL0UflfxovcoPEuGczaXjwJJZzTDq2OutDH-BcE2IDQ2qk6_3UALGvPhopzTRvLg8iQBuFWbeCe9Q44vF2Udp9H5wpwdJAMgPpUVM" />
+                        <div class="absolute top-2 left-2">
+                            <span class="text-[10px] font-bold text-primary bg-white px-2 py-1 rounded shadow-sm">Management</span>
+                        </div>
+                    </div>
+                    <div class="p-4 flex flex-col flex-grow">
+                        <h4 class="font-headline font-bold text-lg text-primary mb-1">US CMA (Cost Mgmt)</h4>
+                        <p class="text-xs text-slate-600 mb-4 leading-snug flex-grow">Advance your corporate accounting career with this prestigious credential.</p>
+                        <button class="w-full py-2 bg-slate-50 border border-slate-200 rounded-lg font-bold text-sm text-primary hover:bg-primary hover:text-white transition-colors duration-300">Program Details</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====================================================== -->
+        <!-- PAGE 3: COURSE DETAILS PAGE -->
+        <!-- ====================================================== -->
+        <div id="courseDetailsPage" class="page">
+            <div id="course-details-container">
+                <div class="relative h-48 rounded-b-3xl overflow-hidden -mx-4 md:-mx-6 -mt-14 mb-4 border-b border-slate-200">
+                    <button onclick="showPage('coursesPage')" class="absolute top-20 left-4 z-30 w-8 h-8 bg-white/90 border border-slate-200 backdrop-blur-md rounded-full flex items-center justify-center text-primary shadow-sm hover:bg-white transition-colors active:scale-95">
+                        <span class="material-symbols-outlined text-sm">arrow_back</span>
+                    </button>
+                    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBub3qLzO2EfVQX0WJ6lr3GmPRIiimt1gnHitbjYaDUEPWcul9CLX2rCvzpaS0P0QBhen5CjwHJhLXyxqRmuzIp6e8SfgQIFgMAWj4UPjTakbpt8jVtEW4xRaj0uWd_JBszQAN69_5-4IPnNdAAx93fXL4cBrzgiNw48JYqJcVH6w8JQQQZnEfBFU8zKvmh9UXOqo6xgmEdOSYq_HLoPRGoJMzYUMBxCuuc7aiarxRT4K36r188eB5sHwoxm5XY2Kdm7xC7yOVq2js" alt="CIA Course" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent z-10"></div>
+                </div>
+                
+                <div class="relative z-20 -mt-16">
+                    <div class="bg-white p-5 rounded-xl shadow-md border border-slate-200 mb-6">
+                        <span class="inline-block bg-slate-100 text-primary font-bold text-[10px] uppercase tracking-widest px-2 py-1 rounded mb-2 border border-slate-200">Accounting & Audit</span>
+                        <h1 class="font-headline text-2xl md:text-3xl font-extrabold text-primary leading-tight">Certified Internal Auditor (CIA)</h1>
+                        <p class="text-slate-600 mt-2 text-sm leading-snug">The premier certification for internal auditors, demonstrating professionalism globally.</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 text-center">
+                        <div class="bg-white border border-slate-200 p-3 rounded-xl shadow-sm">
+                            <span class="material-symbols-outlined text-primary text-xl mb-1">schedule</span>
+                            <span class="block text-[10px] text-slate-500 font-medium">Duration</span>
+                            <span class="block font-bold text-primary text-sm">12-18 Months</span>
+                        </div>
+                        <div class="bg-white border border-slate-200 p-3 rounded-xl shadow-sm">
+                            <span class="material-symbols-outlined text-primary text-xl mb-1">library_books</span>
+                            <span class="block text-[10px] text-slate-500 font-medium">Structure</span>
+                            <span class="block font-bold text-primary text-sm">3 Parts</span>
+                        </div>
+                        <div class="bg-white border border-slate-200 p-3 rounded-xl shadow-sm">
+                            <span class="material-symbols-outlined text-primary text-xl mb-1">payments</span>
+                            <span class="block text-[10px] text-slate-500 font-medium">Avg. Salary</span>
+                            <span class="block font-bold text-primary text-sm">₹15 LPA+</span>
+                        </div>
+                         <div class="bg-white border border-slate-200 p-3 rounded-xl shadow-sm">
+                            <span class="material-symbols-outlined text-primary text-xl mb-1">devices</span>
+                            <span class="block text-[10px] text-slate-500 font-medium">Format</span>
+                            <span class="block font-bold text-primary text-sm">Hybrid</span>
+                        </div>
+                    </div>
+
+                    <!-- Course Content Tabs -->
+                    <div class="mb-6">
+                        <h3 class="font-headline text-xl font-extrabold text-primary mb-3">Program Curriculum</h3>
+                        <div class="space-y-2">
+                            <div class="bg-white border border-slate-200 p-4 rounded-lg shadow-sm flex items-start gap-3">
+                                <div class="w-8 h-8 bg-primary/10 rounded flex items-center justify-center text-primary font-bold text-sm shrink-0">1</div>
+                                <div>
+                                    <h4 class="font-bold text-sm text-primary mb-0.5">Essentials of Internal Auditing</h4>
+                                    <p class="text-slate-600 text-xs leading-snug">Foundations, Independence, Objectivity, Proficiency, Due Professional Care.</p>
+                                </div>
+                            </div>
+                            <div class="bg-white border border-slate-200 p-4 rounded-lg shadow-sm flex items-start gap-3">
+                                <div class="w-8 h-8 bg-primary/10 rounded flex items-center justify-center text-primary font-bold text-sm shrink-0">2</div>
+                                <div>
+                                    <h4 class="font-bold text-sm text-primary mb-0.5">Practice of Internal Auditing</h4>
+                                    <p class="text-slate-600 text-xs leading-snug">Managing the Activity, Planning, Performing, and Communicating Results.</p>
+                                </div>
+                            </div>
+                            <div class="bg-white border border-slate-200 p-4 rounded-lg shadow-sm flex items-start gap-3">
+                                <div class="w-8 h-8 bg-primary/10 rounded flex items-center justify-center text-primary font-bold text-sm shrink-0">3</div>
+                                <div>
+                                    <h4 class="font-bold text-sm text-primary mb-0.5">Business Knowledge</h4>
+                                    <p class="text-slate-600 text-xs leading-snug">Business Acumen, Information Security, IT, and Financial Management.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                     <div class="mb-14">
+                        <h3 class="font-headline text-xl font-extrabold text-primary mb-3">Career Opportunities</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-white border border-slate-200 shadow-sm text-primary font-bold px-3 py-1.5 rounded-md text-[11px]">Internal Auditor</span>
+                            <span class="bg-white border border-slate-200 shadow-sm text-primary font-bold px-3 py-1.5 rounded-md text-[11px]">Risk Manager</span>
+                            <span class="bg-white border border-slate-200 shadow-sm text-primary font-bold px-3 py-1.5 rounded-md text-[11px]">Compliance Officer</span>
+                            <span class="bg-white border border-slate-200 shadow-sm text-primary font-bold px-3 py-1.5 rounded-md text-[11px]">Audit Manager</span>
+                        </div>
+                    </div>
+                </div>
+                 <div class="fixed bottom-[60px] left-0 w-full z-40 bg-white/95 backdrop-blur-xl p-3 border-t border-slate-200 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+                    <div class="max-w-7xl mx-auto flex gap-3">
+                        <a href="https://wa.me/919773464206" target="_blank" class="w-full bg-primary hover:bg-opacity-90 text-white font-bold py-2.5 rounded-lg text-sm transition-colors shadow-sm flex items-center justify-center">Enroll Now</a>
+                        <button class="w-12 bg-slate-100 hover:bg-slate-200 text-primary border border-slate-200 rounded-lg flex items-center justify-center transition-colors"><span class="material-symbols-outlined text-lg">bookmark_border</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====================================================== -->
+        <!-- PAGE 4: WEBINARS PAGE -->
+        <!-- ====================================================== -->
+        <div id="webinarsPage" class="page">
+            <div class="mb-6 text-center md:text-left mt-2">
+                <h1 class="font-headline text-3xl font-extrabold text-primary mb-1 tracking-tight">Knowledge Sessions</h1>
+                <p class="text-slate-600 text-xs">Join live masterclasses led by industry stalwarts.</p>
+            </div>
+
+            <!-- Upcoming Webinars -->
+             <section class="mb-8">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                    <h2 class="font-headline text-xl font-bold text-primary">Upcoming Events & Live Streams</h2>
+                </div>
+                 <div id="upcoming-webinars-list" class="bg-primary rounded-xl p-5 md:p-6 text-white space-y-4 shadow-md relative overflow-hidden">
+                    <div class="absolute right-[-10%] top-0 opacity-10 transform scale-125 pointer-events-none">
+                        <span class="material-symbols-outlined text-[150px]">calendar_month</span>
+                    </div>
+                     <div class="relative z-10">
+                        <div class="inline-block bg-white/20 backdrop-blur-md border border-white/20 px-2 py-0.5 rounded text-[10px] font-bold tracking-widest uppercase mb-2">Nov 28, 2024 - 7:00 PM IST</div>
+                        <h3 class="font-headline text-xl font-extrabold mt-1 text-white leading-tight">Crack CIA in First Attempt</h3>
+                        <p class="text-slate-300 mt-1 text-xs max-w-sm leading-snug">Expert tips, tricks, and complete roadmap to success.</p>
+                        <a href="https://wa.me/919773464206" target="_blank" class="mt-3 bg-secondary-container text-on-secondary-container font-bold px-4 py-2 rounded-lg shadow hover:bg-yellow-300 transition-colors text-xs flex items-center gap-2 w-fit">
+                            <span class="material-symbols-outlined text-[16px]">play_circle</span> Watch Live
+                        </a>
+                     </div>
+                      <div class="border-t border-white/20 pt-4 relative z-10">
+                        <div class="inline-block bg-white/10 backdrop-blur-md border border-white/10 px-2 py-0.5 rounded text-[10px] font-bold tracking-widest uppercase mb-2">Dec 05, 2024 - 6:00 PM IST</div>
+                        <h3 class="font-headline text-lg font-bold mt-1 text-white leading-tight">Future of Financial Risk</h3>
+                        <p class="text-slate-400 mt-1 text-xs max-w-sm leading-snug">Dive into the evolving landscape of risk and FRM.</p>
+                         <a href="https://wa.me/919773464206" target="_blank" class="mt-3 bg-white/10 text-white font-bold px-4 py-2 rounded-lg hover:bg-white/20 transition-colors border border-white/20 text-xs inline-block">Register Now</a>
+                     </div>
+                 </div>
+            </section>
+             <!-- Past Webinars -->
+             <section class="mb-8">
+                <h2 class="font-headline text-xl font-bold text-primary mb-4">Past Recordings (YouTube)</h2>
+                 <div id="past-webinars-list" class="space-y-3">
+                     <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex items-center justify-between gap-3 hover-lift">
+                         <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center text-red-600 shrink-0"><span class="material-symbols-outlined text-xl">smart_display</span></div>
+                            <div>
+                                <h4 class="font-bold text-sm text-primary mb-0.5">Intro to US CMA</h4>
+                                <p class="text-[10px] font-medium text-slate-500">Oct 15, 2024 • 1h 20m</p>
+                            </div>
+                         </div>
+                         <button class="bg-slate-50 border border-slate-200 text-primary font-bold px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors text-xs">
+                             Watch
+                         </button>
+                     </div>
+                      <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex items-center justify-between gap-3 hover-lift">
+                         <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center text-red-600 shrink-0"><span class="material-symbols-outlined text-xl">smart_display</span></div>
+                            <div>
+                                <h4 class="font-bold text-sm text-primary mb-0.5">Paths after CISA</h4>
+                                <p class="text-[10px] font-medium text-slate-500">Sep 28, 2024 • 55m</p>
+                            </div>
+                         </div>
+                         <button class="bg-slate-50 border border-slate-200 text-primary font-bold px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors text-xs">
+                             Watch
+                         </button>
+                     </div>
+                 </div>
+            </section>
+        </div>
+
+        <!-- ====================================================== -->
+        <!-- PAGE 5: MCQs PAGE -->
+        <!-- ====================================================== -->
+        <div id="mcqPage" class="page">
+            <div class="mb-6 text-center md:text-left mt-2">
+                <h1 class="font-headline text-3xl font-extrabold text-primary mb-1 tracking-tight">Practice MCQs</h1>
+                <p class="text-slate-600 text-xs">Test your knowledge with our curated multiple-choice questions.</p>
+            </div>
+             
+             <div id="mcq-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <!-- MCQ Bundle Card 1 -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover-lift cursor-pointer" onclick="showPage('mcqDetailsPage')">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600"><span class="material-symbols-outlined">quiz</span></div>
+                            <div>
+                                <h4 class="font-bold text-sm text-primary">CIA Part 1</h4>
+                                <p class="text-[10px] font-medium text-slate-500">Internal Audit Basics</p>
+                            </div>
+                        </div>
+                        <span class="bg-slate-100 border border-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] font-bold shadow-sm">150 Qs</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-1.5 mb-2"><div class="bg-blue-600 h-1.5 rounded-full" style="width: 0%"></div></div>
+                    <p class="text-[10px] text-slate-500 text-right font-medium">0% Completed</p>
+                </div>
+
+                <!-- MCQ Bundle Card 2 -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover-lift cursor-pointer" onclick="showPage('mcqDetailsPage')">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center text-orange-600"><span class="material-symbols-outlined">quiz</span></div>
+                            <div>
+                                <h4 class="font-bold text-sm text-primary">FRM Level 1</h4>
+                                <p class="text-[10px] font-medium text-slate-500">Financial Markets</p>
+                            </div>
+                        </div>
+                        <span class="bg-slate-100 border border-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] font-bold shadow-sm">200 Qs</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-1.5 mb-2"><div class="bg-orange-500 h-1.5 rounded-full" style="width: 15%"></div></div>
+                    <p class="text-[10px] text-slate-500 text-right font-medium">15% Completed</p>
+                </div>
+
+                <!-- MCQ Bundle Card 3 -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover-lift cursor-pointer" onclick="showPage('mcqDetailsPage')">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center text-green-600"><span class="material-symbols-outlined">quiz</span></div>
+                            <div>
+                                <h4 class="font-bold text-sm text-primary">US CMA</h4>
+                                <p class="text-[10px] font-medium text-slate-500">Cost Management</p>
+                            </div>
+                        </div>
+                        <span class="bg-slate-100 border border-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] font-bold shadow-sm">120 Qs</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-1.5 mb-2"><div class="bg-green-500 h-1.5 rounded-full" style="width: 45%"></div></div>
+                    <p class="text-[10px] text-slate-500 text-right font-medium">45% Completed</p>
+                </div>
+
+                <!-- MCQ Bundle Card 4 -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover-lift cursor-pointer" onclick="showPage('mcqDetailsPage')">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center text-purple-600"><span class="material-symbols-outlined">quiz</span></div>
+                            <div>
+                                <h4 class="font-bold text-sm text-primary">General Finance</h4>
+                                <p class="text-[10px] font-medium text-slate-500">Corporate Accounting</p>
+                            </div>
+                        </div>
+                        <span class="bg-slate-100 border border-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] font-bold shadow-sm">50 Qs</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-1.5 mb-2"><div class="bg-purple-500 h-1.5 rounded-full" style="width: 100%"></div></div>
+                    <p class="text-[10px] text-slate-500 text-right font-medium text-purple-600">100% Completed</p>
+                </div>
+             </div>
+        </div>
+
+        <!-- ====================================================== -->
+        <!-- PAGE 6: MCQ DETAILS PAGE -->
+        <!-- ====================================================== -->
+        <div id="mcqDetailsPage" class="page">
+            <div id="dynamic-mcq-player">
+                <div class="flex items-center gap-3 mb-6 pb-2 border-b border-slate-200 mt-2">
+                    <button onclick="showPage('mcqPage')" class="w-8 h-8 bg-white border border-slate-200 rounded-full flex items-center justify-center text-primary shadow-sm hover:bg-slate-50 active:scale-95 transition-all"><span class="material-symbols-outlined text-sm">arrow_back</span></button>
+                    <div>
+                        <h1 class="font-headline text-xl font-extrabold text-primary">CIA Part 1 Practice</h1>
+                        <p class="text-[10px] text-slate-500 font-medium">Question 1 of 150</p>
+                    </div>
+                </div>
+                
+                <!-- Question Container -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm mb-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="bg-blue-50 text-blue-600 font-bold px-2 py-1 rounded text-[10px] border border-blue-100">Single Choice</span>
+                        <span class="text-[10px] font-bold text-slate-400 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">timer</span> 01:25</span>
+                    </div>
+                    <h3 class="font-bold text-sm text-primary mb-5 leading-relaxed">1. What is the primary purpose of the internal audit activity according to the IIA Standards?</h3>
+                    
+                    <div class="space-y-3">
+                        <label class="flex items-start gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 hover:border-blue-200 transition-colors">
+                            <input type="radio" name="q1" class="mt-0.5 text-blue-600 focus:ring-blue-500 w-4 h-4">
+                            <span class="text-xs text-slate-700 font-medium">To add value and improve an organization's operations.</span>
+                        </label>
+                        <label class="flex items-start gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 hover:border-blue-200 transition-colors">
+                            <input type="radio" name="q1" class="mt-0.5 text-blue-600 focus:ring-blue-500 w-4 h-4">
+                            <span class="text-xs text-slate-700 font-medium">To provide absolute assurance regarding financial statements.</span>
+                        </label>
+                        <label class="flex items-start gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 hover:border-blue-200 transition-colors">
+                            <input type="radio" name="q1" class="mt-0.5 text-blue-600 focus:ring-blue-500 w-4 h-4">
+                            <span class="text-xs text-slate-700 font-medium">To manage risk and implement control procedures daily.</span>
+                        </label>
+                        <label class="flex items-start gap-3 p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 hover:border-blue-200 transition-colors">
+                            <input type="radio" name="q1" class="mt-0.5 text-blue-600 focus:ring-blue-500 w-4 h-4">
+                            <span class="text-xs text-slate-700 font-medium">To replace the need for external auditors entirely.</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="flex justify-between gap-3 mb-8">
+                     <button class="flex-1 bg-slate-50 text-slate-600 font-bold py-3 rounded-xl text-sm transition-colors border border-slate-200 shadow-sm hover:bg-slate-100 active:scale-95">Previous</button>
+                     <button class="flex-1 bg-primary hover:bg-opacity-90 text-white font-bold py-3 rounded-xl text-sm transition-colors shadow-sm active:scale-95">Next Question</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ====================================================== -->
+        <!-- PAGE 10: PROFILE PAGE - UPDATED WITH FACEBOOK & WHATSAPP LINKS -->
+        <!-- ====================================================== -->
+        <div id="profilePage" class="page">
+            <div class="flex flex-col items-center text-center mt-2 mb-6">
+                <div class="w-24 h-24 rounded-full bg-slate-100 overflow-hidden border-2 border-white shadow-md mb-3 relative">
+                     <img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkfvkgQXG4DBLJeYAVcA2RkHJjSVjTBRrVr0COJGWvi-bFwFL2Vq9HstmSrTbu4eSb1tue76_Sv5sJ8HCEGa5U3moM7LxtIk4o5WdtvSP5Dx308ilhlht5Z963yEwTlb8o3fq8IOvMTE_0xOR614ymmFametWxD9Fy-6tC-rfkMa9MPGR2-m2dCe8LNDqEuAOXVzdeBgGJ3u9Cnvj_2qTTqJ-FTKkaKGkXHKZjwwUz5IsNpsSIbzQz1RISHnNKiAfcnvOObyUb464" />
+                     <button class="absolute bottom-0 w-full bg-primary/80 backdrop-blur-sm text-white py-0.5 text-[10px] font-bold">EDIT</button>
+                </div>
+                <h1 class="font-headline text-2xl font-extrabold text-primary leading-tight">Rohan Verma</h1>
+                <p class="text-slate-500 font-medium text-xs">rohan.verma@email.com</p>
+                <div class="mt-2 bg-secondary text-on-secondary-container px-3 py-1 rounded-full text-[10px] font-bold shadow-sm">Pro Member</div>
+            </div>
+            
+            <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mb-4">
+                 <a href="#" class="flex items-center justify-between p-3.5 border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600"><span class="material-symbols-outlined text-lg">school</span></div>
+                        <span class="font-bold text-primary text-sm">My Programs</span>
+                    </div>
+                     <span class="material-symbols-outlined text-slate-400 text-lg">chevron_right</span>
+                </a>
+                 <a href="#" class="flex items-center justify-between p-3.5 border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center text-green-600"><span class="material-symbols-outlined text-lg">bar_chart</span></div>
+                        <span class="font-bold text-primary text-sm">Performance</span>
+                    </div>
+                     <span class="material-symbols-outlined text-slate-400 text-lg">chevron_right</span>
+                </a>
+                 <a href="#" class="flex items-center justify-between p-3.5 border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center text-purple-600"><span class="material-symbols-outlined text-lg">account_circle</span></div>
+                        <span class="font-bold text-primary text-sm">Account</span>
+                    </div>
+                     <span class="material-symbols-outlined text-slate-400 text-lg">chevron_right</span>
+                </a>
+                 <a href="#" class="flex items-center justify-between p-3.5 border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center text-slate-600"><span class="material-symbols-outlined text-lg">settings</span></div>
+                        <span class="font-bold text-primary text-sm">Settings</span>
+                    </div>
+                     <span class="material-symbols-outlined text-slate-400 text-lg">chevron_right</span>
+                </a>
+                <a href="https://www.facebook.com/gmsisuccess.div" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between p-3.5 border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-800"><span class="material-symbols-outlined text-lg">groups</span></div>
+                        <span class="font-bold text-primary text-sm">Follow on Facebook</span>
+                    </div>
+                     <span class="material-symbols-outlined text-slate-400 text-lg">chevron_right</span>
+                </a>
+                <a href="https://wa.me/919773464206" target="_blank" class="flex items-center justify-between p-3.5 hover:bg-slate-50 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-orange-50 rounded-lg flex items-center justify-center text-orange-600"><span class="material-symbols-outlined text-lg">support_agent</span></div>
+                        <span class="font-bold text-primary text-sm">Help & Support</span>
+                    </div>
+                     <span class="material-symbols-outlined text-slate-400 text-lg">chevron_right</span>
+                </a>
+            </div>
+
+            <a href="#" class="flex items-center justify-center gap-2 p-3.5 bg-white border border-red-200 rounded-xl shadow-sm hover:bg-red-50 transition-colors">
+                <span class="material-symbols-outlined text-red-600 text-lg">logout</span>
+                <span class="font-bold text-red-600 text-sm">Secure Logout</span>
+            </a>
+        </div>
+        
+        <!-- ====================================================== -->
+        <!-- PAGE 11: NOTIFICATIONS PAGE -->
+        <!-- ====================================================== -->
+        <div id="notificationsPage" class="page">
+            <div class="flex items-center gap-3 mb-6 pb-2 border-b border-slate-200">
+                <button onclick="history.back()" class="w-8 h-8 bg-white border border-slate-200 rounded-full flex items-center justify-center text-primary shadow-sm hover:bg-slate-50 active:scale-95"><span class="material-symbols-outlined text-sm">arrow_back</span></button>
+                <h1 class="font-headline text-2xl font-extrabold text-primary">Notifications</h1>
+            </div>
+
+            <div class="space-y-3">
+                <div class="flex gap-3 p-4 bg-blue-50/50 rounded-xl border border-blue-100 shadow-sm">
+                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 shrink-0"><span class="material-symbols-outlined text-lg">task_alt</span></div>
+                    <div>
+                        <h4 class="font-bold text-sm text-primary mb-0.5">Assignment Evaluated</h4>
+                        <p class="text-[11px] font-medium text-slate-600 leading-snug">Assignment for 'CIA Part 1' evaluated. Grade: A+</p>
+                        <span class="text-[9px] font-bold text-blue-600 mt-2 block uppercase tracking-wider">Just Now</span>
+                    </div>
+                </div>
+                 <div class="flex gap-3 p-4 bg-white rounded-xl border border-slate-200 shadow-sm">
+                    <div class="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center text-orange-600 shrink-0"><span class="material-symbols-outlined text-lg">campaign</span></div>
+                    <div>
+                        <h4 class="font-bold text-sm text-primary mb-0.5">Masterclass Alert!</h4>
+                        <p class="text-[11px] font-medium text-slate-600 leading-snug">Don't miss 'Future of Financial Risk'. Registrations closing.</p>
+                        <span class="text-[9px] font-bold text-slate-400 mt-2 block uppercase tracking-wider">2 hours ago</span>
+                    </div>
+                </div>
+                 <div class="flex gap-3 p-4 bg-white rounded-xl border border-slate-200 shadow-sm">
+                    <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-600 shrink-0"><span class="material-symbols-outlined text-lg">school</span></div>
+                    <div>
+                        <h4 class="font-bold text-sm text-primary mb-0.5">Live Class Reminder</h4>
+                        <p class="text-[11px] font-medium text-slate-600 leading-snug">'FRM Part 2' session starts in 30 mins. Join via dashboard.</p>
+                        <span class="text-[9px] font-bold text-slate-400 mt-2 block uppercase tracking-wider">Yesterday</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+         <!-- Placeholder pages for other nav items -->
+        <div id="mentorsPage" class="page"><h1 class="font-headline text-3xl font-extrabold text-primary">Mentors</h1></div>
+        <div id="blogPage" class="page"><h1 class="font-headline text-3xl font-extrabold text-primary">Insights & Blog</h1></div>
+        <div id="contactPage" class="page"><h1 class="font-headline text-3xl font-extrabold text-primary">Contact Us</h1></div>
+        <div id="aboutPage" class="page"><div id="dynamic-about-content"><h1 class="font-headline text-3xl font-extrabold text-primary">About Us</h1></div></div>
+
+    </main>
+
+    <!-- BottomNavBar -->
+    <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pt-2 pb-5 bg-white/95 backdrop-blur-xl border-t border-slate-200 shadow-[0_-10px_20px_rgba(0,0,0,0.04)]">
+        <a href="#" class="bottom-nav-link flex flex-col items-center justify-center px-3 py-1.5 transition-all duration-200 ease-out transform text-slate-500 hover:text-primary active:scale-95" data-page="homePage">
+            <span class="material-symbols-outlined text-[24px]">home</span>
+            <span class="font-['Inter'] text-[9px] font-bold uppercase tracking-widest mt-1">Home</span>
+        </a>
+        <a href="#" class="bottom-nav-link flex flex-col items-center justify-center px-3 py-1.5 transition-all duration-200 ease-out transform text-slate-500 hover:text-primary active:scale-95" data-page="coursesPage">
+            <span class="material-symbols-outlined text-[24px]">menu_book</span>
+            <span class="font-['Inter'] text-[9px] font-bold uppercase tracking-widest mt-1">Courses</span>
+        </a>
+        <a href="#" class="bottom-nav-link flex flex-col items-center justify-center px-3 py-1.5 transition-all duration-200 ease-out transform text-slate-500 hover:text-primary active:scale-95" data-page="webinarsPage">
+            <span class="material-symbols-outlined text-[24px]">video_camera_front</span>
+            <span class="font-['Inter'] text-[9px] font-bold uppercase tracking-widest mt-1">Events</span>
+        </a>
+        <a href="#" class="bottom-nav-link flex flex-col items-center justify-center px-3 py-1.5 transition-all duration-200 ease-out transform text-slate-500 hover:text-primary active:scale-95" data-page="mcqPage">
+            <span class="material-symbols-outlined text-[24px]">quiz</span>
+            <span class="font-['Inter'] text-[9px] font-bold uppercase tracking-widest mt-1">MCQs</span>
+        </a>
+        <a href="#" class="bottom-nav-link flex flex-col items-center justify-center px-3 py-1.5 transition-all duration-200 ease-out transform text-slate-500 hover:text-primary active:scale-95" data-page="profilePage">
+            <span class="material-symbols-outlined text-[24px]">person</span>
+            <span class="font-['Inter'] text-[9px] font-bold uppercase tracking-widest mt-1">Profile</span>
+        </a>
+    </nav>
+    
+    <script>
+        const pages = document.querySelectorAll('.page');
+        const navLinks = document.querySelectorAll('.bottom-nav-link');
+        const mainContent = document.getElementById('main-content');
+
+        // Global Page Change Logic
+        window.showPage = function(pageId) {
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                void targetPage.offsetWidth; 
+                targetPage.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            navLinks.forEach(link => {
+                if (link.dataset.page === pageId) {
+                    link.classList.add('active-nav');
+                } else {
+                    link.classList.remove('active-nav');
+                }
+            });
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+                const pageId = link.dataset.page;
+                showPage(pageId);
+            });
+        });
+
+        // Safe Slider Initialization Function
+        window.initHeroSlider = function() {
+            const track = document.getElementById('hero-slider-track');
+            if (track && track.children.length > 0) {
+                // Clear any existing clones and intervals to avoid duplication
+                const oldClones = track.querySelectorAll('.clone-slide');
+                oldClones.forEach(el => el.remove());
+                if (window.heroSliderInterval) clearInterval(window.heroSliderInterval);
+
+                const firstSlideClone = track.children[0].cloneNode(true);
+                firstSlideClone.classList.add('clone-slide');
+                track.appendChild(firstSlideClone);
+                
+                let currentIndex = 0;
+                const totalSlides = track.children.length;
+                
+                window.heroSliderInterval = setInterval(() => {
+                    currentIndex++;
+                    track.style.transition = 'transform 0.5s ease-in-out';
+                    track.style.transform = `translateX(-${currentIndex * 100}%)`;
+                    
+                    if (currentIndex === totalSlides - 1) {
+                        setTimeout(() => {
+                            track.style.transition = 'none';
+                            currentIndex = 0;
+                            track.style.transform = `translateX(0)`;
+                        }, 500); 
+                    }
+                }, 3000); 
+            }
+        };
+
+        // Initialize static defaults on load
+        document.addEventListener('DOMContentLoaded', () => {
+            showPage('homePage');
+            window.initHeroSlider();
+        });
+    </script>
+
+    <!-- FIREBASE WEB SDK INTEGRATION (DYNAMIC USER PANEL) -->
+    <!-- DO NOT MODIFY OR DELETE - Exact requested logic for dynamic connection -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB4jDUkGOAtZDzWfQ-KKTPGlLu05NdMQMU",
+            authDomain: "flipmed-9abe8.firebaseapp.com",
+            databaseURL: "https://flipmed-9abe8-default-rtdb.firebaseio.com",
+            projectId: "flipmed-9abe8",
+            storageBucket: "flipmed-9abe8.firebasestorage.app",
+            messagingSenderId: "115049987394",
+            appId: "1:115049987394:web:c8140220615408486f9cdb",
+            measurementId: "G-SKFVC60VHX"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getDatabase(app);
+
+        // 1. DYNAMIC HERO SLIDER IMAGES
+        onValue(ref(db, 'content/heroSlider'), (snapshot) => {
+            if (snapshot.exists()) {
+                const slides = snapshot.val();
+                let html = '';
+                for (let key in slides) {
+                    html += `<img src="${slides[key].imageURL}" class="w-full h-full object-contain shrink-0" alt="Dynamic Slide">`;
+                }
+                const track = document.getElementById('hero-slider-track');
+                track.innerHTML = html;
+                window.initHeroSlider(); // Re-initialize slider logic seamlessly
+            }
+        });
+
+        // 2. DYNAMIC 'WHY CHOOSE US' CONTENT
+        onValue(ref(db, 'content/whyChooseUs'), (snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                if(data.title) document.getElementById('why-choose-us-title').innerText = data.title;
+                if(data.description) document.getElementById('why-choose-us-desc').innerText = data.description;
+                
+                if(data.cards) {
+                    let html = '';
+                    for (let key in data.cards) {
+                        const card = data.cards[key];
+                        html += `
+                        <div class="min-w-[200px] flex-1 bg-white border border-slate-200 p-4 rounded-xl hover-lift">
+                            <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-3 text-primary border border-blue-200">
+                                <span class="material-symbols-outlined text-lg">${card.icon || 'star'}</span>
+                            </div>
+                            <h3 class="font-headline font-bold text-sm mb-1 text-primary">${card.title}</h3>
+                            <p class="text-on-surface-variant text-[11px] leading-snug">${card.desc}</p>
+                        </div>`;
+                    }
+                    document.getElementById('why-choose-us-cards').innerHTML = html;
+                }
+            }
+        });
+
+        // 3. DYNAMIC COURSES (POPULAR & ALL) WITH YOUTUBE LINK SUPPORT
+        onValue(ref(db, 'content/courses'), (snapshot) => {
+            if (snapshot.exists()) {
+                const courses = snapshot.val();
+                let homeHtml = '';
+                let allHtml = '';
+                
+                for (let key in courses) {
+                    const c = courses[key];
+                    // Dynamic Youtube Button rendering
+                    const youtubeBtn = c.youtubeLink ? `<a href="${c.youtubeLink}" target="_blank" class="w-10 py-2 bg-red-50 border border-red-100 rounded-lg flex items-center justify-center text-red-600 hover:bg-red-100 transition-colors"><span class="material-symbols-outlined text-[20px]">smart_display</span></a>` : '';
+
+                    const cardHtml = `
+                    <div class="min-w-[260px] bg-white border border-slate-200 rounded-xl overflow-hidden hover-lift flex flex-col cursor-pointer">
+                        <div class="h-32 overflow-hidden relative" onclick="showPage('courseDetailsPage')">
+                            <img alt="${c.title}" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110" src="${c.imageURL}" />
+                            <div class="absolute top-2 left-2">
+                                <span class="text-[10px] font-bold text-primary bg-white px-2 py-1 rounded shadow-sm">${c.category}</span>
+                            </div>
+                        </div>
+                        <div class="p-4 flex flex-col flex-grow">
+                            <h4 class="font-headline font-bold text-lg text-primary mb-2">${c.title}</h4>
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="flex items-center gap-1 text-xs font-medium text-slate-600"><span class="material-symbols-outlined text-[14px]">schedule</span> ${c.duration}</span>
+                                <span class="flex items-center gap-1 text-xs font-medium text-slate-600"><span class="material-symbols-outlined text-[14px]">group</span> ${c.students}</span>
+                            </div>
+                            <div class="mt-auto pt-2 border-t border-slate-100 flex gap-2">
+                                <button class="w-full py-2 bg-slate-50 border border-slate-200 rounded-lg font-bold text-sm text-primary hover:bg-primary hover:text-white transition-colors duration-300" onclick="showPage('courseDetailsPage')">View Details</button>
+                                ${youtubeBtn}
+                            </div>
+                        </div>
+                    </div>`;
+                    
+                    if (c.isPopular) homeHtml += cardHtml;
+                    allHtml += cardHtml;
+                }
+                
+                document.getElementById('home-popular-courses').innerHTML = homeHtml;
+                document.getElementById('all-courses-grid').innerHTML = allHtml;
+            }
+        });
+
+        // 4. DYNAMIC WEBINARS (LIVE / YOUTUBE)
+        onValue(ref(db, 'content/webinars'), (snapshot) => {
+            if (snapshot.exists()) {
+                const webinars = snapshot.val();
+                let html = '';
+                for (let key in webinars) {
+                    const w = webinars[key];
+                    const btnLink = w.youtubeLink ? `href="${w.youtubeLink}" target="_blank"` : `onclick="alert('Registration will open soon!')"`;
+                    
+                    html += `
+                    <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex items-center justify-between gap-3 hover-lift mb-3">
+                         <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center text-red-600 shrink-0"><span class="material-symbols-outlined text-xl">smart_display</span></div>
+                            <div>
+                                <h4 class="font-bold text-sm text-primary mb-0.5">${w.title}</h4>
+                                <p class="text-[10px] font-medium text-slate-500">${w.dateInfo}</p>
+                            </div>
+                         </div>
+                         <a ${btnLink} class="bg-slate-50 border border-slate-200 text-primary font-bold px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors text-xs flex items-center gap-1 cursor-pointer">
+                             Watch
+                         </a>
+                    </div>`;
+                }
+                document.getElementById('past-webinars-list').innerHTML = html;
+            }
+        });
+
+        // 5. DYNAMIC MCQs
+        onValue(ref(db, 'content/mcqs'), (snapshot) => {
+            if (snapshot.exists()) {
+                const mcqs = snapshot.val();
+                let html = '';
+                for (let key in mcqs) {
+                    const m = mcqs[key];
+                    html += `
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover-lift cursor-pointer" onclick="showPage('mcqDetailsPage')">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600"><span class="material-symbols-outlined">${m.icon || 'quiz'}</span></div>
+                                <div>
+                                    <h4 class="font-bold text-sm text-primary">${m.title}</h4>
+                                    <p class="text-[10px] font-medium text-slate-500">${m.topic}</p>
+                                </div>
+                            </div>
+                            <span class="bg-slate-100 border border-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] font-bold shadow-sm">${m.totalQs} Qs</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-1.5 mb-2"><div class="bg-blue-600 h-1.5 rounded-full" style="width: ${m.completedPercentage}%"></div></div>
+                        <p class="text-[10px] text-slate-500 text-right font-medium">${m.completedPercentage}% Completed</p>
+                    </div>`;
+                }
+                document.getElementById('mcq-list-container').innerHTML = html;
+            }
+        });
+        
+        // FUTURE SCOPE: API Keys stored safely for Admin Panel
+        // ImgBB API Key: fd8aac95aef4d58beb74e4df53c545df (Will be used in the admin panel to push URLs to Firebase)
+    </script>
+</body>
+</html>
