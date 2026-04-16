@@ -1,3 +1,5 @@
+--- START OF FILE Paste April 16, 2026 - 1:02PM ---
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,6 +37,9 @@
         <div class="flex-grow p-4 space-y-2">
             <a href="#" onclick="showPage('page-dashboard')" class="sidebar-link flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 font-semibold transition-all">
                 <span class="material-symbols-outlined text-xl">dashboard</span> Dashboard
+            </a>
+            <a href="#" onclick="showPage('page-users')" class="sidebar-link flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 font-semibold transition-all">
+                <span class="material-symbols-outlined text-xl">group</span> User Leads
             </a>
             <a href="#" onclick="showPage('page-slider')" class="sidebar-link flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 font-semibold transition-all">
                 <span class="material-symbols-outlined text-xl">view_carousel</span> Hero Slider
@@ -75,10 +80,39 @@
                         <h3 class="font-bold text-lg text-slate-800">Quick Stats</h3>
                         <p class="text-sm text-slate-500">Live data from your database.</p>
                         <div class="mt-4 space-y-3">
+                            <div class="flex justify-between items-center"><span class="font-medium text-slate-600">Total Users</span><span id="stat-users" class="font-bold text-lg text-blue-600">0</span></div>
                             <div class="flex justify-between items-center"><span class="font-medium text-slate-600">Total Courses</span><span id="stat-courses" class="font-bold text-lg text-violet-600">0</span></div>
                             <div class="flex justify-between items-center"><span class="font-medium text-slate-600">Total MCQ Bundles</span><span id="stat-mcqs" class="font-bold text-lg text-violet-600">0</span></div>
                             <div class="flex justify-between items-center"><span class="font-medium text-slate-600">Total Testimonials</span><span id="stat-testimonials" class="font-bold text-lg text-violet-600">0</span></div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE: Users/Leads (NEW) -->
+            <div id="page-users" class="page">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">User Leads & Registrations</h2>
+                    <div class="bg-violet-100 text-violet-700 px-4 py-1.5 rounded-lg text-sm font-bold">
+                        Total: <span id="user-count">0</span>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-slate-50 border-b border-slate-200">
+                            <tr>
+                                <th class="px-6 py-4 text-xs font-bold uppercase text-slate-500">User</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase text-slate-500">Contact No.</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase text-slate-500">Address</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase text-slate-500 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-list-container">
+                            <!-- User rows will appear here -->
+                        </tbody>
+                    </table>
+                    <div id="user-empty-state" class="hidden p-10 text-center text-slate-500 font-medium">
+                        No users found in the database.
                     </div>
                 </div>
             </div>
@@ -369,7 +403,8 @@
     const sidebarLinks = document.querySelectorAll('.sidebar-link');
     window.showPage = (pageId) => {
         pages.forEach(p => p.classList.remove('active'));
-        document.getElementById(pageId).classList.add('active');
+        const targetPage = document.getElementById(pageId);
+        if (targetPage) targetPage.classList.add('active');
         sidebarLinks.forEach(l => l.classList.remove('active'));
         const activeLink = document.querySelector(`.sidebar-link[onclick="showPage('${pageId}')"]`);
         if (activeLink) activeLink.classList.add('active');
@@ -589,7 +624,8 @@
     // --- REALTIME DATA FETCHING & DISPLAY ---
     function displayItems(containerId, data, renderFn, notFoundMsg = "No items found.") {
         const container = document.getElementById(containerId);
-        container.innerHTML = !data ? `<p class="text-slate-500 text-sm">${notFoundMsg}</p>` : Object.entries(data).map(([key, value]) => renderFn(key, value)).join('');
+        if (!container) return;
+        container.innerHTML = !data ? `<p class="text-slate-500 text-sm p-4">${notFoundMsg}</p>` : Object.entries(data).map(([key, value]) => renderFn(key, value)).join('');
     }
     
     onValue(ref(db, 'content'), (snapshot) => {
@@ -597,6 +633,53 @@
         document.getElementById('stat-courses').textContent = Object.keys(data.courses || {}).length;
         document.getElementById('stat-mcqs').textContent = Object.keys(data.mcqs || {}).length;
         document.getElementById('stat-testimonials').textContent = Object.keys(data.testimonials || {}).length;
+    });
+
+    // --- USERS LIST DISPLAY (NEW) ---
+    onValue(ref(db, 'users'), (snapshot) => {
+        const users = snapshot.val();
+        const container = document.getElementById('user-list-container');
+        const emptyState = document.getElementById('user-empty-state');
+        const countDisplay = document.getElementById('user-count');
+        const statUsers = document.getElementById('stat-users');
+
+        if (!users) {
+            container.innerHTML = "";
+            emptyState.classList.remove('hidden');
+            countDisplay.textContent = "0";
+            statUsers.textContent = "0";
+            return;
+        }
+
+        emptyState.classList.add('hidden');
+        const userEntries = Object.entries(users);
+        countDisplay.textContent = userEntries.length;
+        statUsers.textContent = userEntries.length;
+
+        container.innerHTML = userEntries.map(([key, value]) => `
+            <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                        <img src="${value.profilePicURL || 'https://ui-avatars.com/api/?name=' + value.name}" class="w-10 h-10 rounded-full object-cover border border-slate-200">
+                        <div>
+                            <p class="font-bold text-slate-800">${value.name || 'N/A'}</p>
+                            <p class="text-xs text-slate-500">ID: ${key.substring(0,8)}...</p>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4">
+                    <a href="tel:${value.phone}" class="text-sm font-medium text-violet-600 hover:underline">${value.phone || 'N/A'}</a>
+                </td>
+                <td class="px-6 py-4">
+                    <p class="text-sm text-slate-600 max-w-xs truncate">${value.address || 'N/A'}</p>
+                </td>
+                <td class="px-6 py-4 text-right">
+                    <button onclick="deleteItem('users/${key}')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors">
+                        <span class="material-symbols-outlined">delete</span>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
     });
 
     onValue(ref(db, 'content/heroSlider'), (snapshot) => {
