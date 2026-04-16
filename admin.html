@@ -1,5 +1,3 @@
---- START OF FILE Paste April 16, 2026 - 1:02PM ---
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,9 +19,20 @@
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        /* Modal Style for Image Zoom */
+        #image-modal { transition: opacity 0.3s ease; }
     </style>
 </head>
 <body class="text-slate-800">
+
+<!-- Image Preview Modal (New Feature) -->
+<div id="image-modal" class="fixed inset-0 z-[999] hidden bg-black/90 flex items-center justify-center p-4">
+    <button onclick="closeImageModal()" class="absolute top-5 right-5 text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition-all">
+        <span class="material-symbols-outlined text-3xl">close</span>
+    </button>
+    <img id="modal-image" src="" class="max-w-full max-h-[90vh] rounded-lg shadow-2xl object-contain">
+</div>
 
 <div class="flex h-screen bg-slate-100">
     <!-- Sidebar -->
@@ -89,7 +98,7 @@
                 </div>
             </div>
 
-            <!-- PAGE: Users/Leads (NEW) -->
+            <!-- PAGE: Users/Leads -->
             <div id="page-users" class="page">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-bold">User Leads & Registrations</h2>
@@ -101,8 +110,8 @@
                     <table class="w-full text-left border-collapse">
                         <thead class="bg-slate-50 border-b border-slate-200">
                             <tr>
-                                <th class="px-6 py-4 text-xs font-bold uppercase text-slate-500">User</th>
-                                <th class="px-6 py-4 text-xs font-bold uppercase text-slate-500">Contact No.</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase text-slate-500">User Image & Name</th>
+                                <th class="px-6 py-4 text-xs font-bold uppercase text-slate-500">Contact No (ID)</th>
                                 <th class="px-6 py-4 text-xs font-bold uppercase text-slate-500">Address</th>
                                 <th class="px-6 py-4 text-xs font-bold uppercase text-slate-500 text-right">Action</th>
                             </tr>
@@ -373,7 +382,21 @@
     const IMGBB_API_KEY = "fd8aac95aef4d58beb74e4df53c545df";
 
     // --- GLOBAL STATE & HELPERS ---
-    let currentMcqBundleKey = null; // To track which bundle we are adding questions to
+    let currentMcqBundleKey = null;
+
+    // Image Modal Logic (Attached to window for global access)
+    window.openImageModal = (url) => {
+        const modal = document.getElementById('image-modal');
+        const modalImg = document.getElementById('modal-image');
+        modalImg.src = url;
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden'; // Stop scrolling
+    };
+    window.closeImageModal = () => {
+        const modal = document.getElementById('image-modal');
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto'; // Restore scrolling
+    };
 
     async function uploadImageToImgBB(file) {
         const formData = new FormData();
@@ -409,11 +432,10 @@
         const activeLink = document.querySelector(`.sidebar-link[onclick="showPage('${pageId}')"]`);
         if (activeLink) activeLink.classList.add('active');
     };
-    showPage('page-dashboard'); // Set initial page
+    showPage('page-dashboard');
 
     // --- FORM SUBMISSION HANDLERS ---
     
-    // 1. HERO SLIDER
     document.getElementById('form-slider').addEventListener('submit', async (e) => {
         e.preventDefault();
         const file = document.getElementById('sliderFile').files[0];
@@ -433,7 +455,6 @@
         btn.innerHTML = '<span class="material-symbols-outlined text-base">cloud_upload</span> Upload Image';
     });
     
-    // 2. TESTIMONIALS
     document.getElementById('form-testimonial').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('btn-testimonial');
@@ -477,7 +498,6 @@
         btn.disabled = false;
     });
 
-    // 3. COURSES
     document.getElementById('form-course').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('btn-course');
@@ -523,7 +543,6 @@
         btn.disabled = false;
     });
 
-    // 4. MCQ BUNDLES
     document.getElementById('form-mcq-bundle').addEventListener('submit', async (e) => {
         e.preventDefault();
         const editKey = document.getElementById('mEditKey').value;
@@ -542,7 +561,6 @@
         resetMcqBundleForm();
     });
     
-    // 5. MCQ QUESTIONS
     document.getElementById('form-mcq-question').addEventListener('submit', async (e) => {
         e.preventDefault();
         if(!currentMcqBundleKey) { alert("No bundle selected. Please go back."); return; }
@@ -570,7 +588,6 @@
         resetMcqQuestionForm();
     });
     
-    // 6. WEBINARS
     document.getElementById('form-webinar').addEventListener('submit', async (e) => {
         e.preventDefault();
         const editKey = document.getElementById('wEditKey').value;
@@ -588,7 +605,6 @@
         resetWebinarForm();
     });
     
-    // 7. SITE SETTINGS - WHY CHOOSE US
     document.getElementById('form-why').addEventListener('submit', async (e) => {
         e.preventDefault();
         const editKey = document.getElementById('whyEditKey').value;
@@ -605,7 +621,6 @@
         resetWhyForm();
     });
     
-    // 8. SITE SETTINGS - SOCIAL LINKS
     document.getElementById('form-social').addEventListener('submit', async (e) => {
         e.preventDefault();
         const editKey = document.getElementById('socialEditKey').value;
@@ -635,7 +650,7 @@
         document.getElementById('stat-testimonials').textContent = Object.keys(data.testimonials || {}).length;
     });
 
-    // --- USERS LIST DISPLAY (NEW) ---
+    // --- USERS LIST DISPLAY (UPDATED) ---
     onValue(ref(db, 'users'), (snapshot) => {
         const users = snapshot.val();
         const container = document.getElementById('user-list-container');
@@ -656,22 +671,29 @@
         countDisplay.textContent = userEntries.length;
         statUsers.textContent = userEntries.length;
 
-        container.innerHTML = userEntries.map(([key, value]) => `
+        container.innerHTML = userEntries.map(([key, value]) => {
+            const profileImg = value.profilePicURL || `https://ui-avatars.com/api/?name=${value.name || 'User'}&background=random`;
+            return `
             <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                 <td class="px-6 py-4">
                     <div class="flex items-center gap-3">
-                        <img src="${value.profilePicURL || 'https://ui-avatars.com/api/?name=' + value.name}" class="w-10 h-10 rounded-full object-cover border border-slate-200">
+                        <img src="${profileImg}" 
+                             onclick="openImageModal('${profileImg}')"
+                             title="Click to zoom"
+                             class="w-12 h-12 rounded-full object-cover border-2 border-slate-200 cursor-zoom-in hover:scale-110 transition-transform shadow-sm">
                         <div>
                             <p class="font-bold text-slate-800">${value.name || 'N/A'}</p>
-                            <p class="text-xs text-slate-500">ID: ${key.substring(0,8)}...</p>
+                            <p class="text-[10px] text-slate-400 font-mono">UID: ${key.substring(0,10)}...</p>
                         </div>
                     </div>
                 </td>
                 <td class="px-6 py-4">
-                    <a href="tel:${value.phone}" class="text-sm font-medium text-violet-600 hover:underline">${value.phone || 'N/A'}</a>
+                    <a href="tel:${key}" class="text-sm font-bold text-violet-600 hover:underline flex items-center gap-1">
+                        <span class="material-symbols-outlined text-base">call</span> ${key}
+                    </a>
                 </td>
                 <td class="px-6 py-4">
-                    <p class="text-sm text-slate-600 max-w-xs truncate">${value.address || 'N/A'}</p>
+                    <p class="text-sm text-slate-600 max-w-xs truncate" title="${value.address || 'N/A'}">${value.address || 'N/A'}</p>
                 </td>
                 <td class="px-6 py-4 text-right">
                     <button onclick="deleteItem('users/${key}')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors">
@@ -679,7 +701,7 @@
                     </button>
                 </td>
             </tr>
-        `).join('');
+        `}).join('');
     });
 
     onValue(ref(db, 'content/heroSlider'), (snapshot) => {
@@ -811,7 +833,6 @@
         if (hiddenKey) hiddenKey.value = '';
     }
 
-    // Testimonials
     window.resetTestimonialForm = () => {
         resetFormState('form-testimonial', 'testimonial-form-title', "Add New Testimonial", 'btn-testimonial-text', "Add Testimonial", 'btn-testimonial-cancel');
         document.getElementById('tCurrentImageURL').value = '';
@@ -830,7 +851,6 @@
         window.scrollTo(0, 0);
     }
 
-    // Courses
     window.resetCourseForm = () => {
         resetFormState('form-course', 'course-form-title', "Add New Course", 'btn-course-text', "Publish Course", 'btn-course-cancel');
         document.getElementById('cCurrentImageURL').value = '';
@@ -852,7 +872,6 @@
         window.scrollTo(0, 0);
     }
     
-    // MCQ Bundle
     window.resetMcqBundleForm = () => resetFormState('form-mcq-bundle', 'mcq-bundle-form-title', "Create New Bundle", 'btn-mcq-bundle-text', "Create Bundle", 'btn-mcq-bundle-cancel');
     window.editMcqBundle = (key, data) => {
         setupEditState('mcq-bundle-form-title', 'Edit Bundle', 'btn-mcq-bundle-text', 'Update Bundle', 'btn-mcq-bundle-cancel');
@@ -864,7 +883,6 @@
         window.scrollTo(0, 0);
     }
 
-    // MCQ Question
     window.resetMcqQuestionForm = () => resetFormState('form-mcq-question', 'mcq-question-form-title', "Add New Question", 'btn-mcq-question-text', "Add Question", 'btn-mcq-question-cancel');
     window.editMcqQuestion = (key, data) => {
         setupEditState('mcq-question-form-title', 'Edit Question', 'btn-mcq-question-text', 'Update Question', 'btn-mcq-question-cancel');
@@ -878,7 +896,6 @@
         document.getElementById('page-mcq-questions').scrollTo(0, 0);
     }
 
-    // Webinar
     window.resetWebinarForm = () => resetFormState('form-webinar', 'webinar-form-title', "Add New Webinar", 'btn-webinar-text', "Add Webinar", 'btn-webinar-cancel');
     window.editWebinar = (key, data) => {
         setupEditState('webinar-form-title', 'Edit Webinar', 'btn-webinar-text', 'Update Webinar', 'btn-webinar-cancel');
@@ -889,7 +906,6 @@
         window.scrollTo(0, 0);
     }
 
-    // Why Choose Us
     window.resetWhyForm = () => resetFormState('form-why', 'why-form-title', "Add a New Point", 'btn-why-text', "Add Point", 'btn-why-cancel');
     window.editWhyItem = (key, data) => {
         setupEditState('why-form-title', 'Edit Point', 'btn-why-text', 'Update Point', 'btn-why-cancel');
@@ -898,7 +914,6 @@
         document.getElementById('whyDetails').value = data.details;
     }
 
-    // Social Links
     window.resetSocialForm = () => resetFormState('form-social', 'social-form-title', "Add a New Link", 'btn-social-text', "Add Link", 'btn-social-cancel');
     window.editSocialLink = (key, data) => {
         setupEditState('social-form-title', 'Edit Link', 'btn-social-text', 'Update Link', 'btn-social-cancel');
@@ -907,7 +922,6 @@
         document.getElementById('sUrl').value = data.url;
     }
 
-    // Initialize required states on page load
     resetTestimonialForm();
     resetCourseForm();
 
