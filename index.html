@@ -425,7 +425,7 @@
         </div>
         <div class="p-3 bg-white border-t border-slate-200 flex gap-2">
             <input type="text" id="chat-input" class="flex-1 bg-slate-100 border border-slate-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary" placeholder="Type query...">
-            <button onclick="sendChatMessage()" class="bg-primary text-white px-3 py-2 rounded-lg hover:bg-primary/90 transition-colors"><span class="material-symbols-outlined text-[18px]">send</span></button>
+            <button id="chat-send-btn" onclick="sendChatMessage()" class="bg-primary text-white px-3 py-2 rounded-lg hover:bg-primary/90 transition-colors"><span class="material-symbols-outlined text-[18px]">send</span></button>
         </div>
     </div>
 
@@ -546,6 +546,9 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue, set, update, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        // === AI CHANGE START: 1. Import Google AI SDK ===
+        import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+        // === AI CHANGE END ===
 
         const firebaseConfig = {
             apiKey: "AIzaSyB4jDUkGOAtZDzWfQ-KKTPGlLu05NdMQMU",
@@ -558,6 +561,15 @@
         };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+
+        // === AI CHANGE START: 2. Initialize the AI with your Key ===
+        // 🔴 SECURITY WARNING: Exposing your API key in client-side code is very risky.
+        // Anyone can steal it. Only use this for demonstration/portfolio purposes.
+        // For a real application, this logic should be on a server.
+        const GEMINI_API_KEY = "AQ.Ab8RN6LWjp3YsvJn5SWgjN2hM53nfWP34LTK8par1C5lVdLrIA";
+        const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        // === AI CHANGE END ===
 
         window.currentUserData = {
             freeMcqsUsed: 0,
@@ -666,8 +678,10 @@
         document.addEventListener('DOMContentLoaded', loadUserProfile);
 
         // --- CHATBOT ---
-        window.sendChatMessage = function() {
+        // === AI CHANGE START: 3. Update the chat function to call the AI ===
+        window.sendChatMessage = async function() {
             const input = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('chat-send-btn');
             const msg = input.value.trim();
             if(!msg) return;
 
@@ -685,29 +699,75 @@
                 window.openPremiumModal('chat_10min', 300, 'Expert Chat Consultation', 'Your 5 free queries are over. Get 10 minutes of uninterrupted expert support.');
                 return;
             }
+            
+            input.value = '';
+            input.disabled = true;
+            sendBtn.disabled = true;
 
             const chatBox = document.getElementById('chat-messages');
+            // Append user's message
             chatBox.innerHTML += `
                 <div class="flex items-start gap-2 justify-end mt-3">
                     <div class="bg-primary/10 border border-primary/20 p-2.5 rounded-xl rounded-tr-sm text-slate-800 shadow-sm">${msg}</div>
                     <div class="w-6 h-6 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[12px]">person</span></div>
                 </div>`;
-            input.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Show a typing indicator
+            const typingIndicator = `
+                <div id="typing-indicator" class="flex items-start gap-2 mt-3">
+                    <div class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[12px]">robot_2</span></div>
+                    <div class="bg-white border border-slate-200 p-2.5 rounded-xl rounded-tl-sm text-slate-700 shadow-sm">
+                        <div class="flex items-center gap-1.5">
+                           <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-pulse delay-0"></span>
+                           <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-pulse delay-150"></span>
+                           <span class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-pulse delay-300"></span>
+                        </div>
+                    </div>
+                </div>`;
+            chatBox.innerHTML += typingIndicator;
+            chatBox.scrollTop = chatBox.scrollHeight;
+
 
             if (data.freeChatQueriesUsed < 5 && Date.now() >= data.premiumChatEndTime) {
                 const mobile = localStorage.getItem('userMobile');
                 update(ref(db, `users/${mobile}`), { freeChatQueriesUsed: data.freeChatQueriesUsed + 1 });
             }
 
-            setTimeout(() => {
-                chatBox.innerHTML += `
-                <div class="flex items-start gap-2 mt-3">
+            try {
+                // Give the AI a persona for better responses
+                const prompt = `You are "Finzo," an expert academic curator and financial advisor for a platform called Finzo. A student is asking you a question. Keep your answer concise, helpful, and professional. The user's question is: "${msg}"`;
+                
+                const result = await model.generateContent(prompt);
+                const response = await result.response;
+                const text = response.text();
+
+                // Replace typing indicator with the actual response
+                const typingDiv = document.getElementById('typing-indicator');
+                if(typingDiv) {
+                    typingDiv.innerHTML = `
                     <div class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[12px]">robot_2</span></div>
-                    <div class="bg-white border border-slate-200 p-2.5 rounded-xl rounded-tl-sm text-slate-700 shadow-sm">Thank you for asking. Based on financial principles, this is an excellent strategy. Need more details?</div>
-                </div>`;
+                    <div class="bg-white border border-slate-200 p-2.5 rounded-xl rounded-tl-sm text-slate-700 shadow-sm">${text}</div>`;
+                    typingDiv.id = ""; // remove id to prevent it from being selected again
+                }
+
+            } catch(error) {
+                console.error("Gemini AI Error:", error);
+                const typingDiv = document.getElementById('typing-indicator');
+                if(typingDiv) {
+                    typingDiv.innerHTML = `
+                    <div class="w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[12px]">error</span></div>
+                    <div class="bg-red-50 border border-red-200 p-2.5 rounded-xl rounded-tl-sm text-red-700 shadow-sm">Sorry, I couldn't process that request right now. Please try again later.</div>`;
+                    typingDiv.id = "";
+                }
+            } finally {
                 chatBox.scrollTop = chatBox.scrollHeight;
-            }, 1000);
+                input.disabled = false;
+                sendBtn.disabled = false;
+                input.focus();
+            }
         }
+        // === AI CHANGE END ===
 
         // --- DYNAMIC CASE STUDIES ---
         onValue(ref(db, 'content/caseStudies'), (snapshot) => {
