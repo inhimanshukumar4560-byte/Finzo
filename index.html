@@ -261,7 +261,7 @@
                     <h2 class="font-headline text-2xl font-extrabold text-primary tracking-tight">Case-Based Mocktests</h2>
                     <p class="text-slate-500 text-xs font-medium">Analyze real scenarios</p>
                 </div>
-                <div id="dynamic-case-studies" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div id="dynamic-case-studies" class="flex overflow-x-auto gap-4 hide-scrollbar pb-4 -mx-4 px-4 md:mx-0 md:px-0">
                     <!-- Case Studies will be injected here from Firebase -->
                 </div>
             </section>
@@ -331,6 +331,18 @@
                 </div>
                 <div id="wcu-detail-content" class="text-slate-700 leading-relaxed text-sm space-y-4"></div>
             </div>
+        </div>
+
+        <!-- Details Page for Case Studies -->
+        <div id="caseStudyDetailPage" class="page">
+            <div class="flex items-center gap-3 mb-4 pb-2 border-b border-slate-200 mt-2">
+                <button onclick="showPage('homePage')" class="w-8 h-8 bg-white border border-slate-200 rounded-full flex items-center justify-center text-primary shadow-sm hover:bg-slate-50 transition-colors"><span class="material-symbols-outlined text-sm">arrow_back</span></button>
+                <h1 class="font-headline text-xl font-extrabold text-primary flex-1 truncate">Case Scenarios</h1>
+            </div>
+            <div id="cs-detail-container" class="bg-white p-4 md:p-8 rounded-3xl border border-slate-200 shadow-md">
+                <!-- Content injected here dynamically -->
+            </div>
+            <div class="mt-6 text-center text-xs font-bold text-slate-400 uppercase tracking-widest pb-8">End of Case Study</div>
         </div>
 
         <!-- OTHER PAGES -->
@@ -700,52 +712,155 @@
         // --- DYNAMIC CASE STUDIES ---
         onValue(ref(db, 'content/caseStudies'), (snapshot) => {
             const container = document.getElementById('dynamic-case-studies');
+            container.className = "flex overflow-x-auto gap-4 hide-scrollbar pb-4 -mx-4 px-4 md:mx-0 md:px-0";
+            
             if (snapshot.exists()) {
                 let html = '';
+                const isUnlocked = window.currentUserData && window.currentUserData.unlockedPackages && window.currentUserData.unlockedPackages['case_study'];
+                
                 Object.entries(snapshot.val()).forEach(([key, val]) => {
                     if (val.isPremium) {
                         html += `
-                        <div class="bg-white border border-slate-200 rounded-xl p-4 flex gap-4 items-center shadow-sm hover:shadow-md transition-shadow cursor-pointer" onclick="openPremiumCaseStudy('${key}')">
-                            <div class="w-16 h-16 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center shrink-0 border border-orange-100 relative">
-                                <span class="material-symbols-outlined text-3xl">lock</span>
+                        <div class="w-36 md:w-48 aspect-square shrink-0 bg-gradient-to-br from-slate-900 to-primary border border-slate-800 rounded-2xl p-4 flex flex-col items-center justify-center text-center shadow-lg relative overflow-hidden cursor-pointer group hover:-translate-y-1 hover:shadow-xl transition-all" onclick="openPremiumCaseStudy('${key}')">
+                            <div class="absolute top-2 right-2 bg-yellow-400/20 text-yellow-400 w-6 h-6 rounded-full backdrop-blur-sm border border-yellow-400/30 flex items-center justify-center transition-transform group-hover:scale-110">
+                                <span class="material-symbols-outlined text-[14px]">${isUnlocked ? 'lock_open' : 'lock'}</span>
                             </div>
-                            <div class="flex-1">
-                                <h3 class="font-bold text-primary">${val.title}</h3>
-                                <p class="text-xs text-slate-500 mb-2">${val.topic}</p>
-                                <span class="bg-orange-100 text-orange-700 text-[10px] font-bold px-2 py-1 rounded uppercase">PREMIUM</span>
+                            <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-yellow-400 mb-3 border border-white/20 shadow-inner group-hover:bg-white/20 transition-colors">
+                                <span class="material-symbols-outlined text-2xl">cases</span>
+                            </div>
+                            <h3 class="font-bold text-white text-[13px] md:text-sm line-clamp-3 leading-snug font-headline px-1">${val.title}</h3>
+                            <div class="mt-auto pt-2 w-full border-t border-white/10 flex justify-center">
+                                <span class="text-[9px] font-bold text-yellow-400 uppercase tracking-widest bg-yellow-400/10 px-2 py-0.5 rounded-full">Premium</span>
                             </div>
                         </div>`;
                     } else {
                         html += `
-                        <div class="bg-white border border-slate-200 rounded-xl p-4 flex gap-4 items-center shadow-sm hover:shadow-md transition-shadow cursor-pointer" onclick="openFreeCaseStudy('${key}')">
-                            <div class="w-16 h-16 rounded-lg bg-green-100 text-green-700 flex items-center justify-center shrink-0">
-                                <span class="material-symbols-outlined text-3xl">auto_stories</span>
+                        <div class="w-36 md:w-48 aspect-square shrink-0 bg-white border border-emerald-100 rounded-2xl p-4 flex flex-col items-center justify-center text-center shadow-sm relative overflow-hidden cursor-pointer group hover:-translate-y-1 hover:shadow-md hover:border-emerald-300 transition-all" onclick="openFreeCaseStudy('${key}')">
+                            <div class="absolute top-0 left-0 w-full h-1 bg-emerald-400 group-hover:bg-emerald-500 transition-colors"></div>
+                            <div class="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 mb-3 border border-emerald-100 shadow-sm group-hover:bg-emerald-100 transition-colors">
+                                <span class="material-symbols-outlined text-2xl">auto_stories</span>
                             </div>
-                            <div class="flex-1">
-                                <h3 class="font-bold text-primary">${val.title}</h3>
-                                <p class="text-xs text-slate-500 mb-2">${val.topic}</p>
-                                <span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded uppercase">FREE</span>
+                            <h3 class="font-bold text-slate-800 text-[13px] md:text-sm line-clamp-3 leading-snug font-headline px-1">${val.title}</h3>
+                            <div class="mt-auto pt-2 w-full border-t border-slate-100 flex justify-center">
+                                <span class="text-[9px] font-bold text-emerald-600 uppercase tracking-widest bg-emerald-50 px-2 py-0.5 rounded-full">Free</span>
                             </div>
                         </div>`;
                     }
                 });
                 container.innerHTML = html;
             } else {
-                container.innerHTML = `<p class="text-sm text-slate-500 col-span-2 text-center py-4 bg-white rounded-xl border border-slate-200 shadow-sm">No Case Studies Available right now.</p>`;
+                container.innerHTML = `<p class="text-sm text-slate-500 w-full text-center py-4 bg-white rounded-xl border border-slate-200 shadow-sm">No Case Studies Available right now.</p>`;
             }
         });
 
         window.openFreeCaseStudy = function(caseKey) {
-            alert("Opening Free Case Study Module... (Database ID: " + caseKey + ")");
+            fetchAndShowCaseStudy(caseKey);
         };
 
         window.openPremiumCaseStudy = function(caseKey) {
-            if(window.currentUserData.unlockedPackages && window.currentUserData.unlockedPackages['case_study']) {
-                alert("Premium Case Study unlocked successfully! Loading content... (Database ID: " + caseKey + ")");
+            const data = window.currentUserData || {};
+            if(data.unlockedPackages && data.unlockedPackages['case_study']) {
+                fetchAndShowCaseStudy(caseKey);
             } else {
-                window.openPremiumModal('case_study', 500, 'Premium Case Studies', 'Unlock advanced scenario analysis & real-world mock cases to boost your career.');
+                window.openPremiumModal('case_study', 500, 'Premium Case Studies', 'Unlock all premium case studies & real-world mock cases to boost your career.');
             }
         };
+
+        function fetchAndShowCaseStudy(caseKey) {
+            get(ref(db, `content/caseStudies/${caseKey}`)).then((snapshot) => {
+                if(snapshot.exists()) {
+                    const data = snapshot.val();
+                    renderCaseStudyDetail(data);
+                    showPage('caseStudyDetailPage');
+                } else {
+                    alert("Case study details not found.");
+                }
+            }).catch(e => {
+                console.error(e);
+                alert("Failed to load case study.");
+            });
+        }
+
+        function renderCaseStudyDetail(data) {
+            let contentHtml = '';
+            
+            if (data.background || data.discovery || data.challenge) {
+                if(data.background) {
+                    contentHtml += `
+                        <div class="relative bg-blue-50/80 p-5 md:p-6 rounded-2xl border border-blue-100 shadow-sm mb-5 overflow-hidden">
+                            <div class="absolute top-0 right-0 w-20 h-20 bg-blue-500/5 rounded-bl-full"></div>
+                            <h4 class="flex items-center gap-2 text-blue-900 font-extrabold mb-3 text-sm uppercase tracking-widest font-headline">
+                                <span class="material-symbols-outlined text-[18px]">info</span> Background
+                            </h4>
+                            <div class="text-[13px] md:text-sm text-slate-700 leading-loose font-medium">${data.background.replace(/\n/g, '<br/>')}</div>
+                        </div>`;
+                }
+                if(data.discovery) {
+                    contentHtml += `
+                        <div class="relative bg-orange-50/80 p-5 md:p-6 rounded-2xl border border-orange-100 shadow-sm mb-5 overflow-hidden">
+                            <div class="absolute top-0 right-0 w-20 h-20 bg-orange-500/5 rounded-bl-full"></div>
+                            <h4 class="flex items-center gap-2 text-orange-900 font-extrabold mb-3 text-sm uppercase tracking-widest font-headline">
+                                <span class="material-symbols-outlined text-[18px]">search</span> The Discovery
+                            </h4>
+                            <div class="text-[13px] md:text-sm text-slate-700 leading-loose font-medium">${data.discovery.replace(/\n/g, '<br/>')}</div>
+                        </div>`;
+                }
+                if(data.challenge) {
+                    contentHtml += `
+                        <div class="relative bg-red-50/80 p-5 md:p-6 rounded-2xl border border-red-100 shadow-sm overflow-hidden">
+                            <div class="absolute top-0 right-0 w-20 h-20 bg-red-500/5 rounded-bl-full"></div>
+                            <h4 class="flex items-center gap-2 text-red-900 font-extrabold mb-3 text-sm uppercase tracking-widest font-headline">
+                                <span class="material-symbols-outlined text-[18px]">warning</span> The Challenge
+                            </h4>
+                            <div class="text-[13px] md:text-sm text-slate-800 leading-loose font-semibold">${data.challenge.replace(/\n/g, '<br/>')}</div>
+                        </div>`;
+                }
+            } else if (data.content) {
+                const formattedText = data.content.replace(/\n/g, '<br/><br/>');
+                contentHtml = `<div class="text-[13px] md:text-sm text-slate-700 leading-loose font-medium bg-slate-50/50 p-6 rounded-2xl border border-slate-100" style="font-family: 'Inter', sans-serif;">${formattedText}</div>`;
+            } else {
+                contentHtml = `
+                    <div class="space-y-5">
+                        <div class="bg-blue-50/80 p-5 rounded-2xl border border-blue-100 shadow-sm relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-16 h-16 bg-blue-500/10 rounded-bl-full"></div>
+                            <h4 class="flex items-center gap-2 text-blue-900 font-extrabold mb-2 text-sm uppercase tracking-widest font-headline">
+                                <span class="material-symbols-outlined text-[18px]">info</span> Background
+                            </h4>
+                            <p class="text-[13px] text-slate-700 leading-loose font-medium">XYZ Manufacturing Ltd. is a mid-sized company producing industrial equipment. During the annual risk assessment, the Chief Audit Executive (CAE) notices a sudden 35% increase in procurement costs for raw materials over the last two quarters.</p>
+                        </div>
+                        
+                        <div class="bg-orange-50/80 p-5 rounded-2xl border border-orange-100 shadow-sm relative overflow-hidden">
+                             <div class="absolute top-0 right-0 w-16 h-16 bg-orange-500/10 rounded-bl-full"></div>
+                            <h4 class="flex items-center gap-2 text-orange-900 font-extrabold mb-2 text-sm uppercase tracking-widest font-headline">
+                                <span class="material-symbols-outlined text-[18px]">search</span> The Discovery
+                            </h4>
+                            <p class="text-[13px] text-slate-700 leading-loose font-medium">The Internal Audit team decides to conduct a deeper substantive testing. A new vendor, "Apex Global Supplies," was onboarded 6 months ago and was awarded 65% of all new contracts. There is no record of a competitive bidding process.</p>
+                        </div>
+                        
+                        <div class="bg-red-50/80 p-5 rounded-2xl border border-red-100 shadow-sm relative overflow-hidden">
+                             <div class="absolute top-0 right-0 w-16 h-16 bg-red-500/10 rounded-bl-full"></div>
+                            <h4 class="flex items-center gap-2 text-red-900 font-extrabold mb-2 text-sm uppercase tracking-widest font-headline">
+                                <span class="material-symbols-outlined text-[18px]">warning</span> The Challenge
+                            </h4>
+                            <p class="text-[13px] text-slate-800 leading-loose font-semibold">The company clearly suffered a financial loss due to control failure. Identify the specific internal control weaknesses and propose an immediate rectification strategy to the Audit Committee.</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            const headerHtml = `
+                <div class="mb-8 text-center md:text-left border-b border-slate-100 pb-6">
+                    <div class="inline-flex items-center justify-center gap-1.5 ${data.isPremium ? 'bg-yellow-100 text-yellow-800 border-yellow-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200'} text-[10px] font-extrabold px-3 py-1.5 rounded-full uppercase tracking-widest border mb-4 shadow-sm">
+                        <span class="material-symbols-outlined text-[14px]">${data.isPremium ? 'workspace_premium' : 'auto_stories'}</span>
+                        ${data.isPremium ? 'Premium Case Study' : 'Free Case Study'}
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-primary font-headline leading-tight">${data.title}</h2>
+                    ${data.topic ? `<p class="text-xs font-bold text-slate-500 mt-3 flex items-center justify-center md:justify-start gap-1"><span class="material-symbols-outlined text-[14px]">sell</span>${data.topic}</p>` : ''}
+                </div>
+            `;
+
+            document.getElementById('cs-detail-container').innerHTML = headerHtml + contentHtml;
+        }
 
         // --- DYNAMIC MCQS (Admin Panel Connected) ---
         onValue(ref(db, 'content/mcqs'), (snapshot) => {
