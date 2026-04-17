@@ -3,367 +3,535 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finzo Admin Dashboard</title>
+    <title>Finzo Premium Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         h1, h2, h3, h4 { font-family: 'Plus Jakarta Sans', sans-serif; }
         .material-symbols-outlined { font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24; }
         .page { display: none; }
-        .page.active { display: block; animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .loading { opacity: 0.7; pointer-events: none; cursor: not-allowed; }
-        .sidebar-link.active { background-color: #5A4BDA1A; color: #5A4BDA; font-weight: 700; }
+        .page.active { display: block; animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Modern Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Sidebar Active State */
+        .sidebar-link { transition: all 0.2s ease; }
+        .sidebar-link.active { background: linear-gradient(90deg, rgba(79,70,229,0.1) 0%, rgba(79,70,229,0.05) 100%); color: #4f46e5; border-right: 4px solid #4f46e5; font-weight: 700; }
+        .sidebar-link.active .material-symbols-outlined { color: #4f46e5; }
         
         /* Modal Style for Image Zoom */
-        #image-modal { transition: opacity 0.3s ease; }
+        #image-modal { transition: opacity 0.3s ease; backdrop-filter: blur(5px); }
+        
+        /* Glassmorphism Cards */
+        .glass-card { background: white; border: 1px solid rgba(226, 232, 240, 0.8); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03); border-radius: 1.25rem; }
     </style>
 </head>
-<body class="text-slate-800">
+<body class="text-slate-800 flex h-screen overflow-hidden">
 
-<!-- Image Preview Modal (New Feature) -->
-<div id="image-modal" class="fixed inset-0 z-[999] hidden bg-black/90 flex items-center justify-center p-4">
-    <button onclick="closeImageModal()" class="absolute top-5 right-5 text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition-all">
+<!-- Image Preview Modal -->
+<div id="image-modal" class="fixed inset-0 z-[999] hidden bg-slate-900/90 flex items-center justify-center p-4">
+    <button onclick="closeImageModal()" class="absolute top-6 right-6 text-white bg-white/10 hover:bg-white/25 rounded-full p-2 transition-all backdrop-blur-md">
         <span class="material-symbols-outlined text-3xl">close</span>
     </button>
-    <img id="modal-image" src="" class="max-w-full max-h-[90vh] rounded-lg shadow-2xl object-contain">
+    <img id="modal-image" src="" class="max-w-full max-h-[90vh] rounded-xl shadow-2xl object-contain border-4 border-white/10">
 </div>
 
-<div class="flex h-screen bg-slate-100">
-    <!-- Sidebar -->
-    <nav class="w-64 bg-white border-r border-slate-200 flex flex-col">
-        <div class="px-6 py-5 border-b border-slate-200 flex items-center gap-3">
-             <div class="bg-[#1B2124] p-2 rounded-lg">
-                <span class="material-symbols-outlined text-2xl text-white">admin_panel_settings</span>
-            </div>
-            <h1 class="text-xl font-bold tracking-wide text-[#1B2124]">Finzo Admin</h1>
+<!-- Sidebar -->
+<nav class="w-72 bg-white border-r border-slate-200 flex flex-col h-full shadow-[4px_0_24px_rgba(0,0,0,0.02)] z-20">
+    <div class="px-6 py-6 border-b border-slate-100 flex items-center gap-3">
+         <div class="bg-indigo-600 p-2.5 rounded-xl shadow-lg shadow-indigo-600/30">
+            <span class="material-symbols-outlined text-2xl text-white leading-none">admin_panel_settings</span>
         </div>
-        <div class="flex-grow p-4 space-y-2">
-            <a href="#" onclick="showPage('page-dashboard')" class="sidebar-link flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 font-semibold transition-all">
-                <span class="material-symbols-outlined text-xl">dashboard</span> Dashboard
-            </a>
-            <a href="#" onclick="showPage('page-users')" class="sidebar-link flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 font-semibold transition-all">
-                <span class="material-symbols-outlined text-xl">group</span> User Leads
-            </a>
-            <a href="#" onclick="showPage('page-slider')" class="sidebar-link flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 font-semibold transition-all">
-                <span class="material-symbols-outlined text-xl">view_carousel</span> Hero Slider
-            </a>
-            <a href="#" onclick="showPage('page-testimonials')" class="sidebar-link flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 font-semibold transition-all">
-                <span class="material-symbols-outlined text-xl">reviews</span> Topper Reviews
-            </a>
-            <a href="#" onclick="showPage('page-courses')" class="sidebar-link flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 font-semibold transition-all">
-                <span class="material-symbols-outlined text-xl">school</span> Courses
-            </a>
-            <a href="#" onclick="showPage('page-mcq-bundles')" class="sidebar-link flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 font-semibold transition-all">
-                <span class="material-symbols-outlined text-xl">quiz</span> MCQs
-            </a>
-            <a href="#" onclick="showPage('page-webinars')" class="sidebar-link flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 font-semibold transition-all">
-                <span class="material-symbols-outlined text-xl">podcasts</span> Webinars
-            </a>
-            <a href="#" onclick="showPage('page-settings')" class="sidebar-link flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-600 hover:bg-slate-50 font-semibold transition-all">
-                <span class="material-symbols-outlined text-xl">settings</span> Site Settings
-            </a>
+        <div>
+            <h1 class="text-xl font-extrabold tracking-tight text-slate-900">Finzo Admin</h1>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Premium Control</p>
         </div>
-        <div class="p-4 border-t border-slate-200">
-             <div class="text-xs text-center bg-emerald-50 text-emerald-700 px-4 py-2 rounded-full border border-emerald-200 flex items-center justify-center font-medium shadow-inner">
-                DB Connected <span class="inline-block w-2 h-2 bg-emerald-500 rounded-full ml-2 animate-pulse"></span>
-            </div>
-        </div>
-    </nav>
+    </div>
+    
+    <div class="flex-grow py-6 overflow-y-auto space-y-1">
+        <p class="px-6 text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Main Menu</p>
+        <a href="#" onclick="showPage('page-dashboard')" class="sidebar-link active flex items-center gap-3 px-6 py-3 text-slate-500 hover:bg-slate-50 font-semibold text-sm">
+            <span class="material-symbols-outlined text-[20px]">dashboard</span> Dashboard
+        </a>
+        <a href="#" onclick="showPage('page-users')" class="sidebar-link flex items-center gap-3 px-6 py-3 text-slate-500 hover:bg-slate-50 font-semibold text-sm">
+            <span class="material-symbols-outlined text-[20px]">group</span> User Leads
+        </a>
+        
+        <p class="px-6 text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-6 mb-2">Academics</p>
+        <a href="#" onclick="showPage('page-courses')" class="sidebar-link flex items-center gap-3 px-6 py-3 text-slate-500 hover:bg-slate-50 font-semibold text-sm">
+            <span class="material-symbols-outlined text-[20px]">school</span> Popular Courses
+        </a>
+        <!-- NEW: Case Studies Menu -->
+        <a href="#" onclick="showPage('page-case-studies')" class="sidebar-link flex items-center gap-3 px-6 py-3 text-slate-500 hover:bg-slate-50 font-semibold text-sm">
+            <span class="material-symbols-outlined text-[20px]">auto_stories</span> Case Studies
+        </a>
+        <a href="#" onclick="showPage('page-mcq-bundles')" class="sidebar-link flex items-center gap-3 px-6 py-3 text-slate-500 hover:bg-slate-50 font-semibold text-sm">
+            <span class="material-symbols-outlined text-[20px]">quiz</span> MCQ Bundles
+        </a>
+        <a href="#" onclick="showPage('page-webinars')" class="sidebar-link flex items-center gap-3 px-6 py-3 text-slate-500 hover:bg-slate-50 font-semibold text-sm">
+            <span class="material-symbols-outlined text-[20px]">podcasts</span> Webinars
+        </a>
 
-    <!-- Main Content -->
-    <main class="flex-1 overflow-y-auto">
-        <div class="max-w-6xl mx-auto py-8 px-4 md:px-6">
+        <p class="px-6 text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-6 mb-2">Website Content</p>
+        <a href="#" onclick="showPage('page-slider')" class="sidebar-link flex items-center gap-3 px-6 py-3 text-slate-500 hover:bg-slate-50 font-semibold text-sm">
+            <span class="material-symbols-outlined text-[20px]">view_carousel</span> Hero Slider
+        </a>
+        <a href="#" onclick="showPage('page-testimonials')" class="sidebar-link flex items-center gap-3 px-6 py-3 text-slate-500 hover:bg-slate-50 font-semibold text-sm">
+            <span class="material-symbols-outlined text-[20px]">reviews</span> Topper Reviews
+        </a>
+        <a href="#" onclick="showPage('page-settings')" class="sidebar-link flex items-center gap-3 px-6 py-3 text-slate-500 hover:bg-slate-50 font-semibold text-sm">
+            <span class="material-symbols-outlined text-[20px]">settings</span> Site Settings
+        </a>
+    </div>
 
-            <!-- PAGE: Dashboard -->
-            <div id="page-dashboard" class="page">
-                <h1 class="text-3xl font-extrabold text-slate-900 mb-2">Welcome, Admin!</h1>
-                <p class="text-slate-500 mb-8">Select a category from the sidebar to manage your website content.</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                        <h3 class="font-bold text-lg text-slate-800">Quick Stats</h3>
-                        <p class="text-sm text-slate-500">Live data from your database.</p>
-                        <div class="mt-4 space-y-3">
-                            <div class="flex justify-between items-center"><span class="font-medium text-slate-600">Total Users</span><span id="stat-users" class="font-bold text-lg text-blue-600">0</span></div>
-                            <div class="flex justify-between items-center"><span class="font-medium text-slate-600">Total Courses</span><span id="stat-courses" class="font-bold text-lg text-violet-600">0</span></div>
-                            <div class="flex justify-between items-center"><span class="font-medium text-slate-600">Total MCQ Bundles</span><span id="stat-mcqs" class="font-bold text-lg text-violet-600">0</span></div>
-                            <div class="flex justify-between items-center"><span class="font-medium text-slate-600">Total Testimonials</span><span id="stat-testimonials" class="font-bold text-lg text-violet-600">0</span></div>
+    <div class="p-4 border-t border-slate-100 bg-slate-50">
+         <div class="text-[11px] bg-white text-slate-600 px-4 py-3 rounded-xl border border-slate-200 flex items-center justify-between font-bold shadow-sm">
+            Database Status
+            <span class="flex items-center gap-1.5 text-emerald-600">
+                <span class="inline-block w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_#10b981]"></span> Live
+            </span>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content Area -->
+<main class="flex-1 h-full overflow-y-auto relative bg-[#f8fafc]">
+    <!-- Top Header inside Main -->
+    <header class="sticky top-0 z-10 bg-white/80 backdrop-blur-lg border-b border-slate-200 px-8 py-4 flex justify-between items-center">
+        <h2 id="top-header-title" class="text-xl font-extrabold text-slate-800 tracking-tight">Dashboard Overview</h2>
+        <div class="flex items-center gap-4">
+            <div class="text-right hidden md:block">
+                <p class="text-sm font-bold text-slate-800">Administrator</p>
+                <p class="text-[10px] text-slate-400 font-bold uppercase">Master Access</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center border-2 border-indigo-200">
+                <span class="material-symbols-outlined">shield_person</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto py-8 px-6 md:px-8">
+
+        <!-- PAGE: Dashboard -->
+        <div id="page-dashboard" class="page active">
+            <div class="mb-8">
+                <h1 class="text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">Welcome back, Admin!</h1>
+                <p class="text-slate-500 font-medium">Here's what's happening with your platform today.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Stat Cards -->
+                <div class="glass-card p-6 relative overflow-hidden group">
+                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500"></div>
+                    <div class="flex justify-between items-start relative z-10">
+                        <div>
+                            <p class="text-sm font-bold text-slate-500 mb-1">Total Users</p>
+                            <h3 id="stat-users" class="text-4xl font-extrabold text-slate-800">0</h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center shadow-sm">
+                            <span class="material-symbols-outlined text-2xl">group</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-card p-6 relative overflow-hidden group">
+                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-indigo-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500"></div>
+                    <div class="flex justify-between items-start relative z-10">
+                        <div>
+                            <p class="text-sm font-bold text-slate-500 mb-1">Case Studies</p>
+                            <h3 id="stat-cases" class="text-4xl font-extrabold text-slate-800">0</h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center shadow-sm">
+                            <span class="material-symbols-outlined text-2xl">auto_stories</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-card p-6 relative overflow-hidden group">
+                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-purple-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500"></div>
+                    <div class="flex justify-between items-start relative z-10">
+                        <div>
+                            <p class="text-sm font-bold text-slate-500 mb-1">MCQ Bundles</p>
+                            <h3 id="stat-mcqs" class="text-4xl font-extrabold text-slate-800">0</h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center shadow-sm">
+                            <span class="material-symbols-outlined text-2xl">quiz</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-card p-6 relative overflow-hidden group">
+                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-emerald-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500"></div>
+                    <div class="flex justify-between items-start relative z-10">
+                        <div>
+                            <p class="text-sm font-bold text-slate-500 mb-1">Toppers</p>
+                            <h3 id="stat-testimonials" class="text-4xl font-extrabold text-slate-800">0</h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center shadow-sm">
+                            <span class="material-symbols-outlined text-2xl">workspace_premium</span>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- PAGE: Users/Leads -->
-            <div id="page-users" class="page">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold">User Leads & Registrations</h2>
-                    <div class="bg-violet-100 text-violet-700 px-4 py-1.5 rounded-lg text-sm font-bold">
-                        Total: <span id="user-count">0</span>
-                    </div>
+        <!-- PAGE: Users/Leads -->
+        <div id="page-users" class="page">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-extrabold text-slate-900">User Registrations</h2>
+                    <p class="text-sm text-slate-500 mt-1">Manage users and see their premium packages.</p>
                 </div>
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-indigo-50 text-indigo-700 px-4 py-2 rounded-xl text-sm font-bold border border-indigo-100 shadow-sm">
+                    Total Leads: <span id="user-count" class="text-lg ml-1">0</span>
+                </div>
+            </div>
+            <div class="glass-card overflow-hidden">
+                <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
-                        <thead class="bg-slate-50 border-b border-slate-200">
+                        <thead class="bg-slate-50/80 border-b border-slate-200 backdrop-blur-sm">
                             <tr>
-                                <th class="px-6 py-4 text-xs font-bold uppercase text-slate-500">User Image & Name</th>
-                                <th class="px-6 py-4 text-xs font-bold uppercase text-slate-500">Contact No (ID)</th>
-                                <th class="px-6 py-4 text-xs font-bold uppercase text-slate-500">Address</th>
-                                <!-- NEW: Added Premium Plans Column -->
-                                <th class="px-6 py-4 text-xs font-bold uppercase text-slate-500">Premium Plans</th>
-                                <th class="px-6 py-4 text-xs font-bold uppercase text-slate-500 text-right">Action</th>
+                                <th class="px-6 py-4 text-xs font-extrabold uppercase tracking-wider text-slate-500">User Profile</th>
+                                <th class="px-6 py-4 text-xs font-extrabold uppercase tracking-wider text-slate-500">Contact & ID</th>
+                                <th class="px-6 py-4 text-xs font-extrabold uppercase tracking-wider text-slate-500">Address</th>
+                                <th class="px-6 py-4 text-xs font-extrabold uppercase tracking-wider text-slate-500">Premium Plans</th>
+                                <th class="px-6 py-4 text-xs font-extrabold uppercase tracking-wider text-slate-500 text-right">Action</th>
                             </tr>
                         </thead>
-                        <tbody id="user-list-container">
-                            <!-- User rows will appear here -->
+                        <tbody id="user-list-container" class="divide-y divide-slate-100 bg-white">
+                            <!-- Dynamic Users -->
                         </tbody>
                     </table>
-                    <div id="user-empty-state" class="hidden p-10 text-center text-slate-500 font-medium">
-                        No users found in the database.
-                    </div>
+                </div>
+                <div id="user-empty-state" class="hidden p-12 text-center text-slate-500 font-medium">
+                    <span class="material-symbols-outlined text-4xl text-slate-300 mb-2 block">group_off</span>
+                    No users found in the database.
                 </div>
             </div>
-
-            <!-- PAGE: Hero Slider -->
-            <div id="page-slider" class="page">
-                <h2 class="text-2xl font-bold mb-6">Manage Hero Slider</h2>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                        <h3 class="font-bold text-lg mb-1">Add New Image</h3>
-                        <p class="text-sm text-slate-500 mb-4">Recommended ratio is 16:9.</p>
-                        <form id="form-slider" class="space-y-4">
-                            <input type="file" id="sliderFile" accept="image/*" required class="w-full text-slate-600 file:mr-4 file:py-2.5 file:px-5 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 transition-all cursor-pointer">
-                            <button type="submit" id="btn-slider" class="w-full bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-6 rounded-lg transition-all flex items-center justify-center gap-2">
-                                <span class="material-symbols-outlined text-base">cloud_upload</span> Upload Image
-                            </button>
-                        </form>
-                    </div>
-                    <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                         <h3 class="font-bold text-lg mb-4">Current Slider Images</h3>
-                         <div id="slider-list-container" class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                             <!-- Dynamic slider images will appear here -->
-                         </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- PAGE: Topper Reviews / Testimonials -->
-            <div id="page-testimonials" class="page">
-                <h2 class="text-2xl font-bold mb-6">Manage Topper Reviews</h2>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                        <h3 id="testimonial-form-title" class="font-bold text-lg mb-1">Add New Testimonial</h3>
-                        <p class="text-sm text-slate-500 mb-4">This will show on the home page.</p>
-                        <form id="form-testimonial" class="space-y-4">
-                            <input type="hidden" id="tEditKey">
-                            <input type="hidden" id="tCurrentImageURL">
-                            <div>
-                                <label class="block text-sm font-bold text-slate-700 mb-1">Topper's Name</label>
-                                <input type="text" id="tName" placeholder="e.g., Rohan Verma" required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-lg outline-none focus:ring-2 focus:ring-violet-400">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-slate-700 mb-1">Review / Quote</label>
-                                <textarea id="tReview" rows="3" placeholder="e.g., The curriculum was fantastic..." required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-lg outline-none focus:ring-2 focus:ring-violet-400"></textarea>
-                            </div>
-                             <div>
-                                <label class="block text-sm font-bold text-slate-700 mb-1">Topper's Image (9:16 ratio)</label>
-                                <p id="tFileHelp" class="text-xs text-slate-500 mb-2">Leave empty if you don't want to change the current image.</p>
-                                <input type="file" id="tFile" accept="image/*" class="w-full text-slate-600 file:mr-4 file:py-2.5 file:px-5 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100">
-                            </div>
-                            <div class="flex gap-2">
-                                <button type="button" id="btn-testimonial-cancel" onclick="resetTestimonialForm()" class="hidden w-1/3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-4 rounded-lg transition-all">Cancel</button>
-                                <button type="submit" id="btn-testimonial" class="w-full bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-6 rounded-lg transition-all flex items-center justify-center gap-2">
-                                    <span class="material-symbols-outlined text-base">add_circle</span> <span id="btn-testimonial-text">Add Testimonial</span>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                         <h3 class="font-bold text-lg mb-4">Current Testimonials</h3>
-                         <div id="testimonial-list-container" class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                             <!-- Dynamic testimonials will appear here -->
-                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PAGE: Courses -->
-            <div id="page-courses" class="page">
-                 <h2 class="text-2xl font-bold mb-6">Manage Courses</h2>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-6">
-                    <h3 id="course-form-title" class="font-bold text-lg mb-4">Add New Course</h3>
-                    <form id="form-course" class="space-y-4">
-                        <input type="hidden" id="cEditKey">
-                        <input type="hidden" id="cCurrentImageURL">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input type="text" id="cTitle" placeholder="Course Title" required class="w-full bg-slate-50 p-3 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-violet-400">
-                            <input type="text" id="cCategory" placeholder="Category Badge" required class="w-full bg-slate-50 p-3 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-violet-400">
-                            <input type="text" id="cDuration" placeholder="Duration (e.g., 12 Months)" required class="w-full bg-slate-50 p-3 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-violet-400">
-                            <input type="text" id="cStudents" placeholder="Students Enrolled" required class="w-full bg-slate-50 p-3 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-violet-400">
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-bold text-slate-700 mb-1">Course Thumbnail</label>
-                                <p id="cFileHelp" class="text-xs text-slate-500 mb-2">Leave empty if not changing the image.</p>
-                                <input type="file" id="cFile" accept="image/*" class="w-full text-slate-600 file:mr-4 file:py-2.5 file:px-5 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100">
-                            </div>
-                            <div class="md:col-span-2 flex items-center gap-3"><input type="checkbox" id="cPopular" class="w-5 h-5"><label for="cPopular">Show in Popular Courses</label></div>
-                        </div>
-                        <div class="flex gap-2">
-                             <button type="button" id="btn-course-cancel" onclick="resetCourseForm()" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-6 rounded-lg transition-all">Cancel</button>
-                            <button type="submit" id="btn-course" class="bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-6 rounded-lg"><span id="btn-course-text">Publish Course</span></button>
-                        </div>
-                    </form>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                    <h3 class="font-bold text-lg mb-4">Existing Courses</h3>
-                    <div id="course-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-                </div>
-            </div>
-
-            <!-- PAGE: MCQ Bundles List -->
-            <div id="page-mcq-bundles" class="page">
-                <h2 class="text-2xl font-bold mb-6">Manage MCQ Bundles</h2>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                     <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                        <h3 id="mcq-bundle-form-title" class="font-bold text-lg mb-4">Create New Bundle</h3>
-                        <form id="form-mcq-bundle" class="space-y-4">
-                            <input type="hidden" id="mEditKey">
-                             <input type="text" id="mTitle" placeholder="Bundle Title (e.g., CIA Part 1)" required class="w-full bg-slate-50 p-3 rounded-lg border">
-                             <input type="text" id="mTopic" placeholder="Topic Name (e.g., Internal Audit Basics)" required class="w-full bg-slate-50 p-3 rounded-lg border">
-                             <input type="number" id="mTotal" placeholder="Total Questions (approx.)" required class="w-full bg-slate-50 p-3 rounded-lg border">
-                             <input type="text" id="mIcon" value="quiz" placeholder="Google Material Icon Name" required class="w-full bg-slate-50 p-3 rounded-lg border">
-                            <div class="flex gap-2">
-                                <button type="button" id="btn-mcq-bundle-cancel" onclick="resetMcqBundleForm()" class="hidden w-1/3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-4 rounded-lg transition-all">Cancel</button>
-                                <button type="submit" id="btn-mcq-bundle" class="w-full bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 rounded-lg"><span id="btn-mcq-bundle-text">Create Bundle</span></button>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                        <h3 class="font-bold text-lg mb-4">Existing Bundles</h3>
-                        <div id="mcq-bundle-list-container" class="space-y-3"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- PAGE: MCQ Questions Management (for a specific bundle) -->
-            <div id="page-mcq-questions" class="page">
-                <div class="flex items-center gap-4 mb-6">
-                    <button onclick="showPage('page-mcq-bundles')" class="bg-white p-2 rounded-full shadow-sm border hover:bg-slate-50"><span class="material-symbols-outlined">arrow_back</span></button>
-                    <div>
-                        <h2 class="text-2xl font-bold">Manage Questions</h2>
-                        <p id="mcq-bundle-name-display" class="text-slate-500 font-medium"></p>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                     <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                        <h3 id="mcq-question-form-title" class="font-bold text-lg mb-4">Add New Question</h3>
-                        <form id="form-mcq-question" class="space-y-4">
-                            <input type="hidden" id="qEditKey">
-                            <div>
-                                <label class="font-bold text-sm mb-1 block">Question Text</label>
-                                <textarea id="qText" rows="3" placeholder="What is the primary purpose of...?" required class="w-full bg-slate-50 p-3 rounded-lg border"></textarea>
-                            </div>
-                            <div>
-                                <label class="font-bold text-sm mb-2 block">Options & Correct Answer</label>
-                                <div class="space-y-2">
-                                    <div class="flex items-center gap-2"><input type="radio" name="correctAnswer" value="a" required class="w-5 h-5"><input id="qOptA" type="text" placeholder="Option A" required class="flex-1 bg-slate-50 p-2 rounded border"></div>
-                                    <div class="flex items-center gap-2"><input type="radio" name="correctAnswer" value="b" class="w-5 h-5"><input id="qOptB" type="text" placeholder="Option B" required class="flex-1 bg-slate-50 p-2 rounded border"></div>
-                                    <div class="flex items-center gap-2"><input type="radio" name="correctAnswer" value="c" class="w-5 h-5"><input id="qOptC" type="text" placeholder="Option C" required class="flex-1 bg-slate-50 p-2 rounded border"></div>
-                                    <div class="flex items-center gap-2"><input type="radio" name="correctAnswer" value="d" class="w-5 h-5"><input id="qOptD" type="text" placeholder="Option D" required class="flex-1 bg-slate-50 p-2 rounded border"></div>
-                                </div>
-                            </div>
-                            <div class="flex gap-2">
-                                <button type="button" id="btn-mcq-question-cancel" onclick="resetMcqQuestionForm()" class="hidden w-1/3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-4 rounded-lg transition-all">Cancel</button>
-                                <button type="submit" id="btn-mcq-question" class="w-full bg-violet-600 text-white font-bold py-3 rounded-lg"><span id="btn-mcq-question-text">Add Question</span></button>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                        <h3 class="font-bold text-lg mb-4">Questions in this Bundle</h3>
-                        <div id="mcq-question-list-container" class="space-y-3 max-h-[60vh] overflow-y-auto pr-2"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PAGE: Webinars -->
-            <div id="page-webinars" class="page">
-                <h2 class="text-2xl font-bold mb-6">Manage Webinars</h2>
-                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-6">
-                    <h3 id="webinar-form-title" class="font-bold text-lg mb-4">Add New Webinar / YouTube Link</h3>
-                    <form id="form-webinar" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="hidden" id="wEditKey">
-                        <input type="text" id="wTitle" placeholder="Webinar Title" required class="w-full bg-slate-50 p-3 rounded-lg border">
-                        <input type="text" id="wDateInfo" placeholder="Date & Time Info" required class="w-full bg-slate-50 p-3 rounded-lg border">
-                        <input type="url" id="wYoutube" placeholder="YouTube URL" required class="md:col-span-2 w-full bg-slate-50 p-3 rounded-lg border">
-                        <div class="md:col-span-2 flex gap-2">
-                            <button type="button" id="btn-webinar-cancel" onclick="resetWebinarForm()" class="hidden bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-6 rounded-lg transition-all">Cancel</button>
-                            <button type="submit" id="btn-webinar" class="bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-6 rounded-lg"><span id="btn-webinar-text">Add Webinar</span></button>
-                        </div>
-                    </form>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                    <h3 class="font-bold text-lg mb-4">Existing Webinars</h3>
-                    <div id="webinar-list-container" class="space-y-3"></div>
-                </div>
-            </div>
-
-            <!-- PAGE: Site Settings -->
-            <div id="page-settings" class="page">
-                <h2 class="text-2xl font-bold mb-6">Site-wide Settings</h2>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- WHY CHOOSE US - NEW -->
-                    <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                        <h3 class="font-bold text-lg mb-4">'Why Choose Us' Section</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div class="md:col-span-1">
-                                <h4 id="why-form-title" class="font-semibold mb-2">Add a New Point</h4>
-                                <form id="form-why" class="space-y-4">
-                                    <input type="hidden" id="whyEditKey">
-                                    <input type="text" id="whyHeadline" placeholder="Headline" required maxlength="50" class="w-full bg-slate-50 p-3 rounded-lg border">
-                                    <textarea id="whyDetails" rows="3" placeholder="Details/Description" required class="w-full bg-slate-50 p-3 rounded-lg border"></textarea>
-                                    <div class="flex gap-2">
-                                        <button type="button" id="btn-why-cancel" onclick="resetWhyForm()" class="hidden w-1/3 bg-slate-200 text-slate-700 font-bold py-2 px-4 rounded-lg">Cancel</button>
-                                        <button type="submit" id="btn-why" class="w-full bg-slate-800 text-white font-bold py-2.5 px-6 rounded-lg"><span id="btn-why-text">Add Point</span></button>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="md:col-span-2">
-                                <h4 class="font-semibold mb-2">Existing Points</h4>
-                                <div id="why-list-container" class="space-y-3 max-h-64 overflow-y-auto pr-2"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- SOCIAL MEDIA - NEW -->
-                    <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                        <h3 class="font-bold text-lg mb-4">Social Media Links</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div class="md:col-span-1">
-                                <h4 id="social-form-title" class="font-semibold mb-2">Add a New Link</h4>
-                                <form id="form-social" class="space-y-4">
-                                    <input type="hidden" id="socialEditKey">
-                                    <input type="text" id="sPlatform" placeholder="Platform (e.g., WhatsApp, Facebook)" required class="w-full bg-slate-50 p-3 rounded-lg border">
-                                    <input type="text" id="sUrl" placeholder="Full URL or Phone Number" required class="w-full bg-slate-50 p-3 rounded-lg border">
-                                    <div class="flex gap-2">
-                                        <button type="button" id="btn-social-cancel" onclick="resetSocialForm()" class="hidden w-1/3 bg-slate-200 text-slate-700 font-bold py-2 px-4 rounded-lg">Cancel</button>
-                                        <button type="submit" id="btn-social" class="w-full bg-slate-800 text-white font-bold py-2.5 px-6 rounded-lg"><span id="btn-social-text">Add Link</span></button>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="md:col-span-2">
-                                <h4 class="font-semibold mb-2">Existing Links</h4>
-                                <div id="social-list-container" class="space-y-3"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
-    </main>
-</div>
+
+        <!-- NEW PAGE: Case Studies -->
+        <div id="page-case-studies" class="page">
+            <h2 class="text-2xl font-extrabold text-slate-900 mb-6 tracking-tight">Manage Case Studies</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-1 glass-card p-6 h-fit sticky top-6">
+                    <h3 id="cs-form-title" class="font-extrabold text-lg mb-4 text-slate-800">Add New Case Study</h3>
+                    <form id="form-case-study" class="space-y-4">
+                        <input type="hidden" id="csEditKey">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Title</label>
+                            <input type="text" id="csTitle" placeholder="e.g., Case Study 1: Fundamentals" required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm font-medium text-slate-800">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Topic / Description</label>
+                            <input type="text" id="csTopic" placeholder="e.g., Internal Audit Basics" required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm font-medium text-slate-800">
+                        </div>
+                        <div class="p-4 bg-orange-50 border border-orange-100 rounded-xl flex items-center justify-between cursor-pointer" onclick="document.getElementById('csPremium').click()">
+                            <div>
+                                <h4 class="text-sm font-bold text-orange-800">Premium Content</h4>
+                                <p class="text-[10px] text-orange-600 mt-0.5">Lock this for free users</p>
+                            </div>
+                            <input type="checkbox" id="csPremium" class="w-5 h-5 rounded border-orange-300 text-orange-600 focus:ring-orange-500 cursor-pointer">
+                        </div>
+                        <div class="flex gap-2 pt-2">
+                            <button type="button" id="btn-cs-cancel" onclick="resetCaseStudyForm()" class="hidden w-1/3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-4 rounded-xl transition-all">Cancel</button>
+                            <button type="submit" id="btn-cs" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/20"><span id="btn-cs-text">Create Module</span></button>
+                        </div>
+                    </form>
+                </div>
+                <div class="lg:col-span-2 glass-card p-6">
+                    <h3 class="font-extrabold text-lg mb-4 text-slate-800">Existing Case Studies</h3>
+                    <div id="case-study-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Dynamic Case Studies -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE: Hero Slider -->
+        <div id="page-slider" class="page">
+            <h2 class="text-2xl font-extrabold text-slate-900 mb-6 tracking-tight">Website Hero Slider</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-1 glass-card p-6 h-fit">
+                    <h3 class="font-extrabold text-lg mb-2 text-slate-800">Upload Banner</h3>
+                    <p class="text-xs text-slate-500 mb-6">Recommended aspect ratio is 16:9 for perfect display.</p>
+                    <form id="form-slider" class="space-y-4">
+                        <div class="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center hover:bg-slate-50 transition-colors">
+                            <span class="material-symbols-outlined text-4xl text-slate-400 mb-2">image</span>
+                            <input type="file" id="sliderFile" accept="image/*" required class="w-full text-xs text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
+                        </div>
+                        <button type="submit" id="btn-slider" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20">
+                            Upload Banner
+                        </button>
+                    </form>
+                </div>
+                <div class="lg:col-span-2 glass-card p-6">
+                     <h3 class="font-extrabold text-lg mb-4 text-slate-800">Live Banners</h3>
+                     <div id="slider-list-container" class="grid grid-cols-2 gap-4">
+                         <!-- Dynamic slider images -->
+                     </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- PAGE: Topper Reviews -->
+        <div id="page-testimonials" class="page">
+            <h2 class="text-2xl font-extrabold text-slate-900 mb-6 tracking-tight">Manage Topper Reviews</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-1 glass-card p-6 h-fit sticky top-6">
+                    <h3 id="testimonial-form-title" class="font-extrabold text-lg mb-4 text-slate-800">Add Testimonial</h3>
+                    <form id="form-testimonial" class="space-y-4">
+                        <input type="hidden" id="tEditKey">
+                        <input type="hidden" id="tCurrentImageURL">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Topper's Name</label>
+                            <input type="text" id="tName" placeholder="e.g., Rohan Verma" required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Review Quote</label>
+                            <textarea id="tReview" rows="3" placeholder="e.g., The curriculum was fantastic..." required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-sm"></textarea>
+                        </div>
+                         <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Photo (9:16 Portrait)</label>
+                            <p id="tFileHelp" class="text-[10px] text-slate-400 mb-2 font-medium">Leave empty to keep current image.</p>
+                            <input type="file" id="tFile" accept="image/*" class="w-full text-xs text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                        </div>
+                        <div class="flex gap-2 pt-2">
+                            <button type="button" id="btn-testimonial-cancel" onclick="resetTestimonialForm()" class="hidden w-1/3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl transition-all">Cancel</button>
+                            <button type="submit" id="btn-testimonial" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/20">
+                                <span id="btn-testimonial-text">Save Review</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="lg:col-span-2 glass-card p-6">
+                     <h3 class="font-extrabold text-lg mb-4 text-slate-800">Published Reviews</h3>
+                     <div id="testimonial-list-container" class="grid grid-cols-2 md:grid-cols-3 gap-5">
+                         <!-- Dynamic testimonials -->
+                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE: Courses -->
+        <div id="page-courses" class="page">
+             <h2 class="text-2xl font-extrabold text-slate-900 mb-6 tracking-tight">Academic Courses</h2>
+            <div class="glass-card p-6 mb-8 relative overflow-hidden">
+                <div class="absolute right-0 top-0 w-32 h-32 bg-indigo-50 rounded-bl-full opacity-50 -z-10"></div>
+                <h3 id="course-form-title" class="font-extrabold text-lg mb-6 text-slate-800 relative z-10">Create New Course</h3>
+                <form id="form-course" class="space-y-5 relative z-10">
+                    <input type="hidden" id="cEditKey">
+                    <input type="hidden" id="cCurrentImageURL">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Course Title</label>
+                            <input type="text" id="cTitle" placeholder="e.g., CIA Part 1" required class="w-full bg-slate-50 p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Category Badge</label>
+                            <input type="text" id="cCategory" placeholder="e.g., Certification" required class="w-full bg-slate-50 p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Duration</label>
+                            <input type="text" id="cDuration" placeholder="e.g., 6 Months" required class="w-full bg-slate-50 p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Students Enrolled</label>
+                            <input type="text" id="cStudents" placeholder="e.g., 500+" required class="w-full bg-slate-50 p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-sm">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Course Thumbnail</label>
+                            <p id="cFileHelp" class="text-[10px] text-slate-400 mb-2 font-medium">Leave empty if not changing.</p>
+                            <input type="file" id="cFile" accept="image/*" class="w-full text-xs text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                        </div>
+                        <div class="md:col-span-2 flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200 w-fit">
+                            <input type="checkbox" id="cPopular" class="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
+                            <label for="cPopular" class="font-bold text-sm text-slate-700 cursor-pointer">Mark as Popular Course (Shows on Home)</label>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 pt-2">
+                         <button type="button" id="btn-course-cancel" onclick="resetCourseForm()" class="hidden bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-8 rounded-xl transition-all">Cancel</button>
+                        <button type="submit" id="btn-course" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-indigo-600/20"><span id="btn-course-text">Publish Course</span></button>
+                    </div>
+                </form>
+            </div>
+            <div class="glass-card p-6">
+                <h3 class="font-extrabold text-lg mb-6 text-slate-800">Course Directory</h3>
+                <div id="course-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </div>
+        </div>
+
+        <!-- PAGE: MCQ Bundles -->
+        <div id="page-mcq-bundles" class="page">
+            <h2 class="text-2xl font-extrabold text-slate-900 mb-6 tracking-tight">MCQ Test Bundles</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                 <div class="lg:col-span-1 glass-card p-6 h-fit sticky top-6">
+                    <h3 id="mcq-bundle-form-title" class="font-extrabold text-lg mb-4 text-slate-800">Create Bundle</h3>
+                    <form id="form-mcq-bundle" class="space-y-4">
+                        <input type="hidden" id="mEditKey">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Bundle Title</label>
+                            <input type="text" id="mTitle" placeholder="e.g., Full Mocktest" required class="w-full bg-slate-50 p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Topic</label>
+                            <input type="text" id="mTopic" placeholder="e.g., Internal Audit" required class="w-full bg-slate-50 p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-sm">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Questions Qty</label>
+                                <input type="number" id="mTotal" placeholder="e.g., 50" required class="w-full bg-slate-50 p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Material Icon</label>
+                                <input type="text" id="mIcon" value="quiz" required class="w-full bg-slate-50 p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-sm">
+                            </div>
+                        </div>
+                        <div class="flex gap-2 pt-2">
+                            <button type="button" id="btn-mcq-bundle-cancel" onclick="resetMcqBundleForm()" class="hidden w-1/3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl transition-all">Cancel</button>
+                            <button type="submit" id="btn-mcq-bundle" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-600/20"><span id="btn-mcq-bundle-text">Save Bundle</span></button>
+                        </div>
+                    </form>
+                </div>
+                <div class="lg:col-span-2 glass-card p-6">
+                    <h3 class="font-extrabold text-lg mb-4 text-slate-800">Available Bundles</h3>
+                    <div id="mcq-bundle-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- PAGE: MCQ Questions -->
+        <div id="page-mcq-questions" class="page">
+            <div class="flex items-center gap-4 mb-6">
+                <button onclick="showPage('page-mcq-bundles')" class="bg-white p-2.5 rounded-full shadow-sm border border-slate-200 hover:bg-slate-50 transition-colors">
+                    <span class="material-symbols-outlined text-slate-600">arrow_back</span>
+                </button>
+                <div>
+                    <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Manage Questions</h2>
+                    <p id="mcq-bundle-name-display" class="text-sm font-bold text-indigo-600 mt-1"></p>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                 <div class="lg:col-span-1 glass-card p-6 h-fit sticky top-6">
+                    <h3 id="mcq-question-form-title" class="font-extrabold text-lg mb-4 text-slate-800">Add Question</h3>
+                    <form id="form-mcq-question" class="space-y-4">
+                        <input type="hidden" id="qEditKey">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Question Text</label>
+                            <textarea id="qText" rows="3" placeholder="Enter the full question..." required class="w-full bg-slate-50 p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-sm"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-2">Options & Answer</label>
+                            <p class="text-[10px] text-slate-400 mb-3 font-medium">Select the radio button for the correct answer.</p>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3"><input type="radio" name="correctAnswer" value="a" required class="w-5 h-5 text-emerald-500 focus:ring-emerald-500 cursor-pointer"><input id="qOptA" type="text" placeholder="Option A" required class="flex-1 bg-slate-50 p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium"></div>
+                                <div class="flex items-center gap-3"><input type="radio" name="correctAnswer" value="b" class="w-5 h-5 text-emerald-500 focus:ring-emerald-500 cursor-pointer"><input id="qOptB" type="text" placeholder="Option B" required class="flex-1 bg-slate-50 p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium"></div>
+                                <div class="flex items-center gap-3"><input type="radio" name="correctAnswer" value="c" class="w-5 h-5 text-emerald-500 focus:ring-emerald-500 cursor-pointer"><input id="qOptC" type="text" placeholder="Option C" required class="flex-1 bg-slate-50 p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium"></div>
+                                <div class="flex items-center gap-3"><input type="radio" name="correctAnswer" value="d" class="w-5 h-5 text-emerald-500 focus:ring-emerald-500 cursor-pointer"><input id="qOptD" type="text" placeholder="Option D" required class="flex-1 bg-slate-50 p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium"></div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 pt-4">
+                            <button type="button" id="btn-mcq-question-cancel" onclick="resetMcqQuestionForm()" class="hidden w-1/3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 rounded-xl transition-all">Cancel</button>
+                            <button type="submit" id="btn-mcq-question" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-600/20"><span id="btn-mcq-question-text">Save Question</span></button>
+                        </div>
+                    </form>
+                </div>
+                <div class="lg:col-span-2 glass-card p-6">
+                    <h3 class="font-extrabold text-lg mb-4 text-slate-800">Questions List</h3>
+                    <div id="mcq-question-list-container" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAGE: Webinars -->
+        <div id="page-webinars" class="page">
+            <h2 class="text-2xl font-extrabold text-slate-900 mb-6 tracking-tight">Live Webinars</h2>
+             <div class="glass-card p-6 mb-8">
+                <h3 id="webinar-form-title" class="font-extrabold text-lg mb-4 text-slate-800">Add Session</h3>
+                <form id="form-webinar" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <input type="hidden" id="wEditKey">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Webinar Title</label>
+                        <input type="text" id="wTitle" placeholder="e.g., Exam Prep Strategy" required class="w-full bg-slate-50 p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Date & Time</label>
+                        <input type="text" id="wDateInfo" placeholder="e.g., 25 Oct, 7:00 PM" required class="w-full bg-slate-50 p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-sm">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">YouTube Link</label>
+                        <input type="url" id="wYoutube" placeholder="https://youtube.com/..." required class="w-full bg-slate-50 p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-sm">
+                    </div>
+                    <div class="md:col-span-2 flex gap-3 pt-2">
+                        <button type="button" id="btn-webinar-cancel" onclick="resetWebinarForm()" class="hidden bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-8 rounded-xl transition-all">Cancel</button>
+                        <button type="submit" id="btn-webinar" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-indigo-600/20"><span id="btn-webinar-text">Publish Webinar</span></button>
+                    </div>
+                </form>
+            </div>
+            <div class="glass-card p-6">
+                <h3 class="font-extrabold text-lg mb-4 text-slate-800">Scheduled Sessions</h3>
+                <div id="webinar-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </div>
+        </div>
+
+        <!-- PAGE: Site Settings -->
+        <div id="page-settings" class="page">
+            <h2 class="text-2xl font-extrabold text-slate-900 mb-6 tracking-tight">Website Configurations</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- WHY CHOOSE US -->
+                <div class="lg:col-span-2 glass-card p-6">
+                    <h3 class="font-extrabold text-lg mb-6 text-slate-800 border-b border-slate-100 pb-2">'Why Choose Us' Section</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="md:col-span-1">
+                            <h4 id="why-form-title" class="font-bold text-sm text-slate-600 uppercase tracking-wide mb-4">Add Card</h4>
+                            <form id="form-why" class="space-y-4">
+                                <input type="hidden" id="whyEditKey">
+                                <input type="text" id="whyHeadline" placeholder="Headline (Max 50 chars)" required maxlength="50" class="w-full bg-slate-50 p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-sm">
+                                <textarea id="whyDetails" rows="4" placeholder="Detailed Description" required class="w-full bg-slate-50 p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-sm"></textarea>
+                                <div class="flex gap-2">
+                                    <button type="button" id="btn-why-cancel" onclick="resetWhyForm()" class="hidden w-1/3 bg-slate-100 text-slate-700 font-bold py-3 rounded-xl">Cancel</button>
+                                    <button type="submit" id="btn-why" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-xl shadow-lg"><span id="btn-why-text">Save Point</span></button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="md:col-span-2">
+                            <h4 class="font-bold text-sm text-slate-600 uppercase tracking-wide mb-4">Live Cards</h4>
+                            <div id="why-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SOCIAL MEDIA -->
+                <div class="lg:col-span-2 glass-card p-6">
+                    <h3 class="font-extrabold text-lg mb-6 text-slate-800 border-b border-slate-100 pb-2">Footer & Social Links</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="md:col-span-1">
+                            <h4 id="social-form-title" class="font-bold text-sm text-slate-600 uppercase tracking-wide mb-4">Add Link</h4>
+                            <form id="form-social" class="space-y-4">
+                                <input type="hidden" id="socialEditKey">
+                                <input type="text" id="sPlatform" placeholder="Platform Name" required class="w-full bg-slate-50 p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-sm">
+                                <input type="text" id="sUrl" placeholder="Full URL / Action Link" required class="w-full bg-slate-50 p-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-sm">
+                                <div class="flex gap-2">
+                                    <button type="button" id="btn-social-cancel" onclick="resetSocialForm()" class="hidden w-1/3 bg-slate-100 text-slate-700 font-bold py-3 rounded-xl">Cancel</button>
+                                    <button type="submit" id="btn-social" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-xl shadow-lg"><span id="btn-social-text">Save Link</span></button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="md:col-span-2">
+                            <h4 class="font-bold text-sm text-slate-600 uppercase tracking-wide mb-4">Live Links</h4>
+                            <div id="social-list-container" class="space-y-3"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -383,23 +551,20 @@
     const db = getDatabase(app);
     const IMGBB_API_KEY = "fd8aac95aef4d58beb74e4df53c545df";
 
-    // --- GLOBAL STATE & HELPERS ---
+    // --- GLOBAL STATE ---
     let currentMcqBundleKey = null;
 
-    // Image Modal Logic (Attached to window for global access)
+    // View Image Modal
     window.openImageModal = (url) => {
         const modal = document.getElementById('image-modal');
-        const modalImg = document.getElementById('modal-image');
-        modalImg.src = url;
+        document.getElementById('modal-image').src = url;
         modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden'; // Stop scrolling
     };
     window.closeImageModal = () => {
-        const modal = document.getElementById('image-modal');
-        modal.classList.add('hidden');
-        document.body.style.overflow = 'auto'; // Restore scrolling
+        document.getElementById('image-modal').classList.add('hidden');
     };
 
+    // ImgBB Upload
     async function uploadImageToImgBB(file) {
         const formData = new FormData();
         formData.append('image', file);
@@ -407,23 +572,21 @@
             const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: 'POST', body: formData });
             const data = await response.json();
             if (data.success) return data.data.display_url;
-            throw new Error(data.error.message || "ImgBB Upload Failed");
+            throw new Error("Upload Failed");
         } catch (error) {
-            console.error(error);
-            alert("Error uploading image: " + error.message);
+            alert("Error uploading image. Check network.");
             return null;
         }
     }
     
-    window.deleteItem = (path, a) => {
-        if (confirm("Are you sure you want to delete this item? This action cannot be undone.")) {
-            remove(ref(db, path))
-              .then(() => alert("Item deleted successfully."))
-              .catch(err => alert("Error deleting item: " + err.message));
+    // Generic Delete
+    window.deleteItem = (path) => {
+        if (confirm("Are you sure you want to delete this item? This action is permanent.")) {
+            remove(ref(db, path)).catch(err => alert("Error: " + err.message));
         }
     }
     
-    // --- UI NAVIGATION LOGIC ---
+    // Page Navigation
     const pages = document.querySelectorAll('.page');
     const sidebarLinks = document.querySelectorAll('.sidebar-link');
     window.showPage = (pageId) => {
@@ -433,36 +596,59 @@
         sidebarLinks.forEach(l => l.classList.remove('active'));
         const activeLink = document.querySelector(`.sidebar-link[onclick="showPage('${pageId}')"]`);
         if (activeLink) activeLink.classList.add('active');
+        
+        // Update Header Title based on Page
+        const titles = {
+            'page-dashboard': 'Dashboard Overview',
+            'page-users': 'User Database',
+            'page-case-studies': 'Case Studies Management',
+            'page-slider': 'Hero Slider Management',
+            'page-testimonials': 'Topper Reviews',
+            'page-courses': 'Course Directory',
+            'page-mcq-bundles': 'MCQ Bundles',
+            'page-mcq-questions': 'Question Editor',
+            'page-webinars': 'Live Webinars',
+            'page-settings': 'Site Settings'
+        };
+        document.getElementById('top-header-title').textContent = titles[pageId] || 'Admin Panel';
     };
-    showPage('page-dashboard');
 
-    // --- FORM SUBMISSION HANDLERS ---
+    // --- FORM SUBMISSIONS ---
     
+    // Slider
     document.getElementById('form-slider').addEventListener('submit', async (e) => {
         e.preventDefault();
         const file = document.getElementById('sliderFile').files[0];
-        if (!file) { alert("Please select an image."); return; }
-        
+        if (!file) return;
         const btn = document.getElementById('btn-slider');
-        btn.disabled = true;
-        btn.innerHTML = 'Uploading...';
-        
+        btn.disabled = true; btn.innerHTML = 'Uploading...';
         const imageUrl = await uploadImageToImgBB(file);
         if (imageUrl) {
             await push(ref(db, 'content/heroSlider'), { imageURL: imageUrl });
-            alert("Slider image added!");
             e.target.reset();
         }
-        btn.disabled = false;
-        btn.innerHTML = '<span class="material-symbols-outlined text-base">cloud_upload</span> Upload Image';
+        btn.disabled = false; btn.innerHTML = 'Upload Banner';
+    });
+
+    // NEW: Case Studies
+    document.getElementById('form-case-study').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const editKey = document.getElementById('csEditKey').value;
+        const data = {
+            title: document.getElementById('csTitle').value,
+            topic: document.getElementById('csTopic').value,
+            isPremium: document.getElementById('csPremium').checked
+        };
+        const path = 'content/caseStudies' + (editKey ? `/${editKey}` : '');
+        await (editKey ? set(ref(db, path), data) : push(ref(db, 'content/caseStudies'), data));
+        resetCaseStudyForm();
     });
     
+    // Testimonials
     document.getElementById('form-testimonial').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('btn-testimonial');
-        btn.disabled = true;
-        const btnText = document.getElementById('btn-testimonial-text');
-        btnText.textContent = 'Saving...';
+        btn.disabled = true; document.getElementById('btn-testimonial-text').textContent = 'Saving...';
         
         const editKey = document.getElementById('tEditKey').value;
         const file = document.getElementById('tFile').files[0];
@@ -470,41 +656,23 @@
 
         if (file) {
             const newImageUrl = await uploadImageToImgBB(file);
-            if (!newImageUrl) {
-                btn.disabled = false;
-                btnText.textContent = editKey ? 'Update Testimonial' : 'Add Testimonial';
-                return;
-            }
-            imageUrl = newImageUrl;
+            if (newImageUrl) imageUrl = newImageUrl;
+            else { btn.disabled = false; return; }
         }
 
-        if (!imageUrl && !editKey) {
-            alert('An image is required for a new testimonial.');
-            btn.disabled = false;
-            btnText.textContent = 'Add Testimonial';
-            return;
-        }
+        if (!imageUrl && !editKey) { alert('Image required.'); btn.disabled = false; return; }
 
-        const testimonialData = {
-            name: document.getElementById('tName').value,
-            review: document.getElementById('tReview').value,
-            imageURL: imageUrl,
-        };
-
-        const dbRef = ref(db, 'content/testimonials' + (editKey ? `/${editKey}` : ''));
-        const dbOperation = editKey ? set(dbRef, testimonialData) : push(dbRef, testimonialData);
-        
-        await dbOperation;
-        alert(`Testimonial ${editKey ? 'updated' : 'added'} successfully!`);
-        resetTestimonialForm();
-        btn.disabled = false;
+        const data = { name: document.getElementById('tName').value, review: document.getElementById('tReview').value, imageURL: imageUrl };
+        const path = 'content/testimonials' + (editKey ? `/${editKey}` : '');
+        await (editKey ? set(ref(db, path), data) : push(ref(db, 'content/testimonials'), data));
+        resetTestimonialForm(); btn.disabled = false;
     });
 
+    // Courses
     document.getElementById('form-course').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('btn-course');
-        btn.disabled = true;
-        document.getElementById('btn-course-text').textContent = 'Saving...';
+        btn.disabled = true; document.getElementById('btn-course-text').textContent = 'Saving...';
 
         const editKey = document.getElementById('cEditKey').value;
         const file = document.getElementById('cFile').files[0];
@@ -512,441 +680,287 @@
 
         if (file) {
             const newImageUrl = await uploadImageToImgBB(file);
-            if (!newImageUrl) {
-                btn.disabled = false;
-                document.getElementById('btn-course-text').textContent = editKey ? 'Update Course' : 'Publish Course';
-                return;
-            }
-            imageUrl = newImageUrl;
+            if (newImageUrl) imageUrl = newImageUrl;
+            else { btn.disabled = false; return; }
         }
 
-        if (!imageUrl && !editKey) {
-            alert('An image is required for a new course.');
-            btn.disabled = false;
-            document.getElementById('btn-course-text').textContent = 'Publish Course';
-            return;
-        }
+        if (!imageUrl && !editKey) { alert('Image required.'); btn.disabled = false; return; }
 
-        const courseData = {
-            title: document.getElementById('cTitle').value,
-            category: document.getElementById('cCategory').value,
-            duration: document.getElementById('cDuration').value,
-            students: document.getElementById('cStudents').value,
-            isPopular: document.getElementById('cPopular').checked,
-            imageURL: imageUrl
+        const data = {
+            title: document.getElementById('cTitle').value, category: document.getElementById('cCategory').value,
+            duration: document.getElementById('cDuration').value, students: document.getElementById('cStudents').value,
+            isPopular: document.getElementById('cPopular').checked, imageURL: imageUrl
         };
-        
-        const dbRefPath = 'content/courses' + (editKey ? `/${editKey}` : '');
-        const dbOperation = editKey ? set(ref(db, dbRefPath), courseData) : push(ref(db, 'content/courses'), courseData);
-
-        await dbOperation;
-        alert(`Course ${editKey ? 'updated' : 'published'}!`);
-        resetCourseForm();
-        btn.disabled = false;
+        const path = 'content/courses' + (editKey ? `/${editKey}` : '');
+        await (editKey ? set(ref(db, path), data) : push(ref(db, 'content/courses'), data));
+        resetCourseForm(); btn.disabled = false;
     });
 
+    // MCQ Bundles
     document.getElementById('form-mcq-bundle').addEventListener('submit', async (e) => {
         e.preventDefault();
         const editKey = document.getElementById('mEditKey').value;
-        const mcqData = {
-            title: document.getElementById('mTitle').value,
-            topic: document.getElementById('mTopic').value,
-            totalQs: document.getElementById('mTotal').value,
-            icon: document.getElementById('mIcon').value,
+        const data = {
+            title: document.getElementById('mTitle').value, topic: document.getElementById('mTopic').value,
+            totalQs: document.getElementById('mTotal').value, icon: document.getElementById('mIcon').value
         };
-        
-        const dbRefPath = 'content/mcqs' + (editKey ? `/${editKey}` : '');
-        const dbOperation = editKey ? set(ref(db, dbRefPath), mcqData) : push(ref(db, 'content/mcqs'), mcqData);
-
-        await dbOperation;
-        alert(`MCQ Bundle ${editKey ? 'updated' : 'created'}!`);
+        const path = 'content/mcqs' + (editKey ? `/${editKey}` : '');
+        await (editKey ? set(ref(db, path), data) : push(ref(db, 'content/mcqs'), data));
         resetMcqBundleForm();
     });
     
+    // MCQ Questions
     document.getElementById('form-mcq-question').addEventListener('submit', async (e) => {
         e.preventDefault();
-        if(!currentMcqBundleKey) { alert("No bundle selected. Please go back."); return; }
-
+        if(!currentMcqBundleKey) return;
         const editKey = document.getElementById('qEditKey').value;
         const correctAns = document.querySelector('input[name="correctAnswer"]:checked');
-        if(!correctAns) { alert("Please select the correct answer."); return; }
+        if(!correctAns) return;
 
-        const questionData = {
+        const data = {
             question: document.getElementById('qText').value,
-            options: {
-                a: document.getElementById('qOptA').value,
-                b: document.getElementById('qOptB').value,
-                c: document.getElementById('qOptC').value,
-                d: document.getElementById('qOptD').value,
-            },
+            options: { a: document.getElementById('qOptA').value, b: document.getElementById('qOptB').value, c: document.getElementById('qOptC').value, d: document.getElementById('qOptD').value },
             correctAnswer: correctAns.value
         };
-
-        const dbRefPath = `content/mcqQuestions/${currentMcqBundleKey}` + (editKey ? `/${editKey}` : '');
-        const dbOperation = editKey ? set(ref(db, dbRefPath), questionData) : push(ref(db, `content/mcqQuestions/${currentMcqBundleKey}`), questionData);
-
-        await dbOperation;
-        alert(`Question ${editKey ? 'updated' : 'added'} to bundle!`);
+        const path = `content/mcqQuestions/${currentMcqBundleKey}` + (editKey ? `/${editKey}` : '');
+        await (editKey ? set(ref(db, path), data) : push(ref(db, `content/mcqQuestions/${currentMcqBundleKey}`), data));
         resetMcqQuestionForm();
     });
     
+    // Webinars
     document.getElementById('form-webinar').addEventListener('submit', async (e) => {
         e.preventDefault();
         const editKey = document.getElementById('wEditKey').value;
-        const webinarData = {
-            title: document.getElementById('wTitle').value,
-            dateInfo: document.getElementById('wDateInfo').value,
-            youtubeLink: document.getElementById('wYoutube').value
-        };
-
-        const dbRefPath = 'content/webinars' + (editKey ? `/${editKey}` : '');
-        const dbOperation = editKey ? set(ref(db, dbRefPath), webinarData) : push(ref(db, 'content/webinars'), webinarData);
-
-        await dbOperation;
-        alert(`Webinar ${editKey ? 'updated' : 'added'}!`);
+        const data = { title: document.getElementById('wTitle').value, dateInfo: document.getElementById('wDateInfo').value, youtubeLink: document.getElementById('wYoutube').value };
+        const path = 'content/webinars' + (editKey ? `/${editKey}` : '');
+        await (editKey ? set(ref(db, path), data) : push(ref(db, 'content/webinars'), data));
         resetWebinarForm();
     });
     
+    // Why Choose Us
     document.getElementById('form-why').addEventListener('submit', async (e) => {
         e.preventDefault();
         const editKey = document.getElementById('whyEditKey').value;
-        const whyData = {
-            headline: document.getElementById('whyHeadline').value,
-            details: document.getElementById('whyDetails').value
-        };
-
-        const dbRefPath = 'content/whyChooseUs' + (editKey ? `/${editKey}` : '');
-        const dbOperation = editKey ? set(ref(db, dbRefPath), whyData) : push(ref(db, 'content/whyChooseUs'), whyData);
-
-        await dbOperation;
-        alert(`'Why Choose Us' point ${editKey ? 'updated' : 'added'}!`);
+        const data = { headline: document.getElementById('whyHeadline').value, details: document.getElementById('whyDetails').value };
+        const path = 'content/whyChooseUs' + (editKey ? `/${editKey}` : '');
+        await (editKey ? set(ref(db, path), data) : push(ref(db, 'content/whyChooseUs'), data));
         resetWhyForm();
     });
     
+    // Social
     document.getElementById('form-social').addEventListener('submit', async (e) => {
         e.preventDefault();
         const editKey = document.getElementById('socialEditKey').value;
-        const socialData = {
-            platform: document.getElementById('sPlatform').value,
-            url: document.getElementById('sUrl').value
-        };
-        const dbRefPath = 'content/socialLinks' + (editKey ? `/${editKey}` : '');
-        const dbOperation = editKey ? set(ref(db, dbRefPath), socialData) : push(ref(db, 'content/socialLinks'), socialData);
-
-        await dbOperation;
-        alert(`Social link ${editKey ? 'updated' : 'added'}!`);
+        const data = { platform: document.getElementById('sPlatform').value, url: document.getElementById('sUrl').value };
+        const path = 'content/socialLinks' + (editKey ? `/${editKey}` : '');
+        await (editKey ? set(ref(db, path), data) : push(ref(db, 'content/socialLinks'), data));
         resetSocialForm();
     });
 
-    // --- REALTIME DATA FETCHING & DISPLAY ---
-    function displayItems(containerId, data, renderFn, notFoundMsg = "No items found.") {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-        container.innerHTML = !data ? `<p class="text-slate-500 text-sm p-4">${notFoundMsg}</p>` : Object.entries(data).map(([key, value]) => renderFn(key, value)).join('');
+
+    // --- REALTIME READS & RENDER ---
+    function render(id, data, fn, empty = "<p class='text-slate-400 text-sm py-4'>No data found.</p>") {
+        const el = document.getElementById(id);
+        if(el) el.innerHTML = !data ? empty : Object.entries(data).map(([k,v]) => fn(k,v)).join('');
     }
-    
-    onValue(ref(db, 'content'), (snapshot) => {
-        const data = snapshot.val() || {};
-        document.getElementById('stat-courses').textContent = Object.keys(data.courses || {}).length;
-        document.getElementById('stat-mcqs').textContent = Object.keys(data.mcqs || {}).length;
-        document.getElementById('stat-testimonials').textContent = Object.keys(data.testimonials || {}).length;
+
+    // Dashboard Stats
+    onValue(ref(db, 'content'), (s) => {
+        const d = s.val() || {};
+        document.getElementById('stat-cases').textContent = Object.keys(d.caseStudies || {}).length;
+        document.getElementById('stat-mcqs').textContent = Object.keys(d.mcqs || {}).length;
+        document.getElementById('stat-testimonials').textContent = Object.keys(d.testimonials || {}).length;
     });
 
-    // --- USERS LIST DISPLAY (UPDATED WITH PREMIUM PLANS) ---
-    onValue(ref(db, 'users'), (snapshot) => {
-        const users = snapshot.val();
+    // Users List with Premium Badges
+    onValue(ref(db, 'users'), (s) => {
+        const users = s.val();
         const container = document.getElementById('user-list-container');
         const emptyState = document.getElementById('user-empty-state');
-        const countDisplay = document.getElementById('user-count');
-        const statUsers = document.getElementById('stat-users');
-
-        if (!users) {
-            container.innerHTML = "";
-            emptyState.classList.remove('hidden');
-            countDisplay.textContent = "0";
-            statUsers.textContent = "0";
-            return;
-        }
-
+        if (!users) { container.innerHTML = ""; emptyState.classList.remove('hidden'); document.getElementById('user-count').textContent = "0"; document.getElementById('stat-users').textContent = "0"; return; }
+        
         emptyState.classList.add('hidden');
-        const userEntries = Object.entries(users);
-        countDisplay.textContent = userEntries.length;
-        statUsers.textContent = userEntries.length;
+        document.getElementById('user-count').textContent = Object.keys(users).length;
+        document.getElementById('stat-users').textContent = Object.keys(users).length;
 
-        container.innerHTML = userEntries.map(([key, value]) => {
-            const profileImg = value.profilePicURL || value.pic || `https://ui-avatars.com/api/?name=${value.name || 'User'}&background=random`;
-            
-            // NEW: Render Premium Badges Logic
-            let premiumBadges = '';
-            if (value.unlockedPackages && value.unlockedPackages['case_study']) {
-                premiumBadges += '<span class="inline-block bg-orange-100 text-orange-700 text-[10px] px-2 py-1 rounded font-bold mr-1 mb-1">Case Study</span>';
-            }
-            if (value.unlockedPackages && value.unlockedPackages['mcq_test']) {
-                premiumBadges += '<span class="inline-block bg-blue-100 text-blue-700 text-[10px] px-2 py-1 rounded font-bold mr-1 mb-1">MCQ Test</span>';
-            }
-            if (value.premiumChatEndTime && value.premiumChatEndTime > Date.now()) {
-                premiumBadges += '<span class="inline-block bg-emerald-100 text-emerald-700 text-[10px] px-2 py-1 rounded font-bold mr-1 mb-1">Pro Chat (Active)</span>';
-            }
-            if (premiumBadges === '') {
-                premiumBadges = '<span class="text-xs text-slate-400 font-medium border border-slate-200 px-2 py-1 rounded">Free User</span>';
-            }
+        container.innerHTML = Object.entries(users).map(([key, v]) => {
+            const pic = v.pic || v.profilePicURL || `https://ui-avatars.com/api/?name=${v.name}&background=random`;
+            let badges = '';
+            if (v.unlockedPackages?.case_study) badges += '<span class="inline-block bg-orange-100 text-orange-700 text-[10px] px-2.5 py-1 rounded-md font-bold mr-1 mb-1 shadow-sm">Case Study Pro</span>';
+            if (v.unlockedPackages?.mcq_test) badges += '<span class="inline-block bg-blue-100 text-blue-700 text-[10px] px-2.5 py-1 rounded-md font-bold mr-1 mb-1 shadow-sm">MCQ Test Pro</span>';
+            if (v.premiumChatEndTime > Date.now()) badges += '<span class="inline-block bg-emerald-100 text-emerald-700 text-[10px] px-2.5 py-1 rounded-md font-bold mr-1 mb-1 shadow-sm">Active Chat Pass</span>';
+            if (!badges) badges = '<span class="text-[10px] text-slate-400 font-bold border border-slate-200 px-2.5 py-1 rounded-md bg-slate-50">Free User</span>';
 
             return `
-            <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+            <tr class="hover:bg-slate-50/50 transition-colors group">
                 <td class="px-6 py-4">
                     <div class="flex items-center gap-3">
-                        <img src="${profileImg}" 
-                             onclick="openImageModal('${profileImg}')"
-                             title="Click to zoom"
-                             class="w-12 h-12 rounded-full object-cover border-2 border-slate-200 cursor-zoom-in hover:scale-110 transition-transform shadow-sm">
-                        <div>
-                            <p class="font-bold text-slate-800">${value.name || 'N/A'}</p>
-                            <p class="text-[10px] text-slate-400 font-mono">UID: ${key.substring(0,10)}...</p>
-                        </div>
+                        <img src="${pic}" onclick="openImageModal('${pic}')" class="w-10 h-10 rounded-full object-cover border border-slate-200 cursor-pointer hover:scale-110 transition-transform shadow-sm">
+                        <div><p class="font-bold text-slate-800 text-sm">${v.name || 'N/A'}</p></div>
                     </div>
                 </td>
                 <td class="px-6 py-4">
-                    <a href="tel:${key}" class="text-sm font-bold text-violet-600 hover:underline flex items-center gap-1">
-                        <span class="material-symbols-outlined text-base">call</span> ${key}
-                    </a>
+                    <a href="tel:${key}" class="text-sm font-bold text-indigo-600 hover:text-indigo-800">${key}</a>
+                    <p class="text-[10px] text-slate-400 font-mono mt-0.5">ID: ${key.substring(0,8)}</p>
                 </td>
-                <td class="px-6 py-4">
-                    <p class="text-sm text-slate-600 max-w-xs truncate" title="${value.address || 'N/A'}">${value.address || 'N/A'}</p>
-                </td>
-                <td class="px-6 py-4">
-                    <div class="flex flex-wrap max-w-[150px]">
-                        ${premiumBadges}
-                    </div>
-                </td>
+                <td class="px-6 py-4 text-xs text-slate-600 max-w-[150px] truncate">${v.address || 'N/A'}</td>
+                <td class="px-6 py-4"><div class="flex flex-wrap max-w-[180px]">${badges}</div></td>
                 <td class="px-6 py-4 text-right">
-                    <button onclick="deleteItem('users/${key}')" class="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors">
-                        <span class="material-symbols-outlined">delete</span>
-                    </button>
+                    <button onclick="deleteItem('users/${key}')" class="text-slate-300 hover:text-red-500 hover:bg-red-50 p-2 rounded-lg transition-all opacity-0 group-hover:opacity-100"><span class="material-symbols-outlined text-[20px]">delete</span></button>
                 </td>
-            </tr>
-        `}).join('');
+            </tr>`;
+        }).join('');
     });
 
-    onValue(ref(db, 'content/heroSlider'), (snapshot) => {
-        displayItems('slider-list-container', snapshot.val(), (key, value) => `
-            <div class="relative group">
-                <img src="${value.imageURL}" class="w-full aspect-video object-cover rounded-lg">
-                <button onclick="deleteItem('content/heroSlider/${key}')" class="absolute top-2 right-2 bg-red-600 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span class="material-symbols-outlined text-sm">delete</span>
-                </button>
-            </div>`);
-    });
-    
-    onValue(ref(db, 'content/testimonials'), (snapshot) => {
-        displayItems('testimonial-list-container', snapshot.val(), (key, value) => `
-            <div class="relative group border rounded-lg p-2 flex flex-col">
-                <img src="${value.imageURL}" class="w-full aspect-[9/16] object-cover rounded-md">
-                <div class="flex-grow pt-2">
-                    <p class="font-bold text-sm mt-1">${value.name}</p>
-                    <p class="text-xs text-slate-500 line-clamp-2">${value.review}</p>
+    // NEW: Case Studies List
+    onValue(ref(db, 'content/caseStudies'), (s) => render('case-study-list-container', s.val(), (key, v) => `
+        <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex items-start justify-between gap-3 relative overflow-hidden">
+            ${v.isPremium ? '<div class="absolute top-0 right-0 w-2 h-full bg-orange-400"></div>' : '<div class="absolute top-0 right-0 w-2 h-full bg-emerald-400"></div>'}
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <h4 class="font-bold text-slate-800">${v.title}</h4>
+                    ${v.isPremium ? '<span class="material-symbols-outlined text-[14px] text-orange-500">lock</span>' : ''}
                 </div>
-                <div class="flex gap-1.5 mt-2">
-                    <button onclick='editTestimonial("${key}", ${JSON.stringify(value)})' class="w-full text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-1.5 px-2 rounded-md">Edit</button>
-                    <button onclick="deleteItem('content/testimonials/${key}')" class="w-full text-xs bg-red-50 hover:bg-red-100 text-red-700 font-bold py-1.5 px-2 rounded-md">Delete</button>
-                </div>
-            </div>`);
-    });
+                <p class="text-xs text-slate-500">${v.topic}</p>
+            </div>
+            <div class="flex gap-1">
+                <button onclick='editCaseStudy("${key}", ${JSON.stringify(v)})' class="p-1.5 text-slate-400 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50 rounded-lg"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+                <button onclick="deleteItem('content/caseStudies/${key}')" class="p-1.5 text-slate-400 hover:text-red-600 bg-slate-50 hover:bg-red-50 rounded-lg"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+            </div>
+        </div>`));
 
-    onValue(ref(db, 'content/courses'), (snapshot) => {
-        displayItems('course-list-container', snapshot.val(), (key, value) => `
-            <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
-                <img src="${value.imageURL}" class="w-full h-32 object-cover rounded-md mb-2">
-                <h4 class="font-bold">${value.title}</h4>
-                <p class="text-sm text-slate-500">${value.category}</p>
-                <div class="flex gap-2 mt-2">
-                    <button onclick='editCourse("${key}", ${JSON.stringify(value)})' class="w-full bg-slate-100 text-slate-700 font-bold py-2 rounded-lg text-sm">Edit</button>
-                    <button onclick="deleteItem('content/courses/${key}')" class="w-full bg-red-50 text-red-700 font-bold py-2 rounded-lg text-sm">Delete</button>
-                </div>
-            </div>`);
-    });
+    // Slider List
+    onValue(ref(db, 'content/heroSlider'), (s) => render('slider-list-container', s.val(), (key, v) => `
+        <div class="relative group rounded-xl overflow-hidden border border-slate-200 shadow-sm">
+            <img src="${v.imageURL}" class="w-full aspect-[16/9] object-cover">
+            <button onclick="deleteItem('content/heroSlider/${key}')" class="absolute top-2 right-2 bg-red-600/90 text-white p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all hover:bg-red-700 backdrop-blur-sm"><span class="material-symbols-outlined text-[16px]">delete</span></button>
+        </div>`));
     
-    onValue(ref(db, 'content/mcqs'), (snapshot) => {
-        displayItems('mcq-bundle-list-container', snapshot.val(), (key, value) => `
-            <div class="bg-slate-50 border p-3 rounded-lg flex justify-between items-center gap-2">
-                <div>
-                    <h4 class="font-bold">${value.title}</h4>
-                    <p class="text-sm text-slate-500">${value.topic}</p>
-                </div>
-                <div class="flex gap-2 flex-shrink-0">
-                    <button onclick='editMcqBundle("${key}", ${JSON.stringify(value)})' class="bg-slate-100 text-slate-700 font-bold p-2 rounded-lg"><span class="material-symbols-outlined text-base">edit</span></button>
-                    <button onclick="manageQuestions('${key}', '${value.title}')" class="bg-violet-100 text-violet-700 font-bold py-2 px-3 rounded-lg text-sm whitespace-nowrap">Manage</button>
-                    <button onclick="deleteItem('content/mcqs/${key}')" class="bg-red-50 text-red-700 font-bold p-2 rounded-lg"><span class="material-symbols-outlined text-base">delete</span></button>
-                </div>
-            </div>`);
-    });
-    
-    onValue(ref(db, 'content/webinars'), (snapshot) => {
-        displayItems('webinar-list-container', snapshot.val(), (key, value) => `
-             <div class="bg-slate-50 border p-3 rounded-lg flex justify-between items-center">
-                <div><h4 class="font-bold">${value.title}</h4><p class="text-sm text-slate-500">${value.dateInfo}</p></div>
-                <div class="flex gap-2">
-                    <button onclick='editWebinar("${key}", ${JSON.stringify(value)})' class="bg-slate-100 text-slate-700 font-bold p-2 rounded-lg"><span class="material-symbols-outlined text-base">edit</span></button>
-                    <button onclick="deleteItem('content/webinars/${key}')" class="bg-red-50 text-red-700 font-bold p-2 rounded-lg"><span class="material-symbols-outlined text-base">delete</span></button>
-                </div>
-            </div>`);
-    });
-    
-    onValue(ref(db, 'content/whyChooseUs'), (snapshot) => {
-        displayItems('why-list-container', snapshot.val(), (key, value) => `
-            <div class="bg-slate-50 border p-3 rounded-lg flex justify-between items-start gap-2">
-                <div><h4 class="font-bold text-sm">${value.headline}</h4><p class="text-xs text-slate-600">${value.details}</p></div>
-                <div class="flex gap-2 flex-shrink-0">
-                    <button onclick='editWhyItem("${key}", ${JSON.stringify(value)})' class="bg-slate-200 p-1.5 rounded-md"><span class="material-symbols-outlined text-sm">edit</span></button>
-                    <button onclick="deleteItem('content/whyChooseUs/${key}')" class="bg-red-100 text-red-700 p-1.5 rounded-md"><span class="material-symbols-outlined text-sm">delete</span></button>
-                </div>
-            </div>`);
-    });
+    // Testimonials List
+    onValue(ref(db, 'content/testimonials'), (s) => render('testimonial-list-container', s.val(), (key, v) => `
+        <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col group">
+            <img src="${v.imageURL}" class="w-full aspect-[9/16] object-cover">
+            <div class="p-3 flex-grow">
+                <h4 class="font-bold text-sm text-slate-800">${v.name}</h4>
+                <p class="text-[11px] text-slate-500 line-clamp-2 mt-1 italic">${v.review}</p>
+            </div>
+            <div class="grid grid-cols-2 border-t border-slate-100">
+                <button onclick='editTestimonial("${key}", ${JSON.stringify(v)})' class="py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors border-r border-slate-100">Edit</button>
+                <button onclick="deleteItem('content/testimonials/${key}')" class="py-2 text-xs font-bold text-red-600 hover:bg-red-50 transition-colors">Delete</button>
+            </div>
+        </div>`));
 
-    onValue(ref(db, 'content/socialLinks'), (snapshot) => {
-        displayItems('social-list-container', snapshot.val(), (key, value) => `
-            <div class="bg-slate-50 border p-3 rounded-lg flex justify-between items-center gap-2">
-                <div><h4 class="font-bold">${value.platform}</h4><p class="text-sm text-slate-500 truncate">${value.url}</p></div>
-                <div class="flex gap-2">
-                    <button onclick='editSocialLink("${key}", ${JSON.stringify(value)})' class="bg-slate-100 p-2 rounded-lg"><span class="material-symbols-outlined text-base">edit</span></button>
-                    <button onclick="deleteItem('content/socialLinks/${key}')" class="bg-red-50 text-red-700 p-2 rounded-lg"><span class="material-symbols-outlined text-base">delete</span></button>
+    // Courses List
+    onValue(ref(db, 'content/courses'), (s) => render('course-list-container', s.val(), (key, v) => `
+        <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm relative">
+            ${v.isPopular ? '<div class="absolute top-2 left-2 bg-indigo-600 text-white text-[9px] font-bold px-2 py-1 rounded uppercase tracking-wider shadow-md">Popular</div>' : ''}
+            <img src="${v.imageURL}" class="w-full h-32 object-cover">
+            <div class="p-4">
+                <h4 class="font-bold text-slate-800 line-clamp-1">${v.title}</h4>
+                <p class="text-[11px] text-slate-500 font-bold uppercase tracking-wider mt-1">${v.category}</p>
+                <div class="flex gap-2 mt-4">
+                    <button onclick='editCourse("${key}", ${JSON.stringify(v)})' class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 rounded-lg text-xs transition-colors">Edit</button>
+                    <button onclick="deleteItem('content/courses/${key}')" class="w-10 bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center rounded-lg transition-colors"><span class="material-symbols-outlined text-[16px]">delete</span></button>
                 </div>
-            </div>`);
-    });
-
-
-    // --- MCQ QUESTION MANAGEMENT LOGIC ---
-    let stopListeningToQuestions; 
+            </div>
+        </div>`));
     
-    window.manageQuestions = (bundleKey, bundleTitle) => {
+    // MCQ Bundles List
+    onValue(ref(db, 'content/mcqs'), (s) => render('mcq-bundle-list-container', s.val(), (key, v) => `
+        <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex flex-col gap-3">
+            <div class="flex justify-between items-start">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center"><span class="material-symbols-outlined">${v.icon}</span></div>
+                    <div><h4 class="font-bold text-slate-800">${v.title}</h4><p class="text-[11px] text-slate-500">${v.topic} • ${v.totalQs} Qs</p></div>
+                </div>
+            </div>
+            <div class="flex gap-2 border-t border-slate-100 pt-3">
+                <button onclick="manageQuestions('${key}', '${v.title}')" class="flex-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold py-2 rounded-lg text-xs transition-colors">Add Q's</button>
+                <button onclick='editMcqBundle("${key}", ${JSON.stringify(v)})' class="px-3 bg-slate-50 hover:bg-slate-100 text-slate-600 rounded-lg"><span class="material-symbols-outlined text-[16px]">edit</span></button>
+                <button onclick="deleteItem('content/mcqs/${key}')" class="px-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg"><span class="material-symbols-outlined text-[16px]">delete</span></button>
+            </div>
+        </div>`));
+    
+    // MCQ Questions Sub-List
+    let stopListeningQuestions; 
+    window.manageQuestions = (bundleKey, title) => {
         currentMcqBundleKey = bundleKey;
-        document.getElementById('mcq-bundle-name-display').textContent = `For: ${bundleTitle}`;
-        showPage('page-mcq-questions');
-        resetMcqQuestionForm();
-        
-        if(stopListeningToQuestions) stopListeningToQuestions();
-        
-        const questionsRef = ref(db, `content/mcqQuestions/${bundleKey}`);
-        stopListeningToQuestions = onValue(questionsRef, (snapshot) => {
-            displayItems('mcq-question-list-container', snapshot.val(), (key, value) => `
-                <div class="bg-slate-50 border p-3 rounded-lg">
-                    <div class="flex justify-between items-start">
-                        <p class="text-sm font-medium pr-4">${value.question}</p>
-                        <div class="flex gap-2">
-                           <button onclick='editMcqQuestion("${key}", ${JSON.stringify(value)})' class="bg-slate-200 text-slate-700 p-1 rounded-md"><span class="material-symbols-outlined text-sm">edit</span></button>
-                           <button onclick="deleteItem('content/mcqQuestions/${bundleKey}/${key}')" class="bg-red-50 text-red-700 p-1 rounded-md"><span class="material-symbols-outlined text-sm">delete</span></button>
-                        </div>
+        document.getElementById('mcq-bundle-name-display').textContent = `Target Bundle: ${title}`;
+        showPage('page-mcq-questions'); resetMcqQuestionForm();
+        if(stopListeningQuestions) stopListeningQuestions();
+        stopListeningQuestions = onValue(ref(db, `content/mcqQuestions/${bundleKey}`), (s) => render('mcq-question-list-container', s.val(), (key, v) => `
+            <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm">
+                <div class="flex justify-between items-start gap-4">
+                    <p class="text-sm font-bold text-slate-800">${v.question}</p>
+                    <div class="flex gap-1 shrink-0">
+                       <button onclick='editMcqQuestion("${key}", ${JSON.stringify(v)})' class="p-1.5 text-slate-400 hover:text-indigo-600 bg-slate-50 rounded-lg"><span class="material-symbols-outlined text-[16px]">edit</span></button>
+                       <button onclick="deleteItem('content/mcqQuestions/${bundleKey}/${key}')" class="p-1.5 text-slate-400 hover:text-red-600 bg-slate-50 rounded-lg"><span class="material-symbols-outlined text-[16px]">delete</span></button>
                     </div>
-                    <div class="text-xs mt-2 p-2 bg-green-50 text-green-800 border border-green-200 rounded">Correct: ${value.options[value.correctAnswer]}</div>
-                </div>`);
-        }, "No questions in this bundle yet.");
+                </div>
+                <div class="mt-3 bg-emerald-50 text-emerald-800 text-xs font-bold px-3 py-2 rounded-lg border border-emerald-100 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[14px]">check_circle</span> Ans: ${v.options[v.correctAnswer]}
+                </div>
+            </div>`));
     }
 
-    // --- EDIT & FORM RESET FUNCTIONS ---
-    const setupEditState = (formTitle, title, btnText, text, btnCancelId) => {
-        document.getElementById(formTitle).textContent = title;
-        document.getElementById(btnText).textContent = text;
-        document.getElementById(btnCancelId).classList.remove('hidden');
-    }
-    const resetFormState = (formId, formTitle, title, btnText, text, btnCancelId) => {
-        document.getElementById(formId).reset();
-        document.getElementById(formTitle).textContent = title;
-        document.getElementById(btnText).textContent = text;
-        document.getElementById(btnCancelId).classList.add('hidden');
-        const hiddenKey = document.querySelector(`#${formId} input[type="hidden"]`);
-        if (hiddenKey) hiddenKey.value = '';
-    }
-
-    window.resetTestimonialForm = () => {
-        resetFormState('form-testimonial', 'testimonial-form-title', "Add New Testimonial", 'btn-testimonial-text', "Add Testimonial", 'btn-testimonial-cancel');
-        document.getElementById('tCurrentImageURL').value = '';
-        document.getElementById('tFile').required = true;
-        document.getElementById('tFileHelp').classList.add('hidden');
-        document.getElementById('btn-testimonial').disabled = false;
-    }
-    window.editTestimonial = (key, data) => {
-        setupEditState('testimonial-form-title', 'Edit Testimonial', 'btn-testimonial-text', 'Update Testimonial', 'btn-testimonial-cancel');
-        document.getElementById('tEditKey').value = key;
-        document.getElementById('tName').value = data.name;
-        document.getElementById('tReview').value = data.review;
-        document.getElementById('tCurrentImageURL').value = data.imageURL;
-        document.getElementById('tFile').required = false;
-        document.getElementById('tFileHelp').classList.remove('hidden');
-        window.scrollTo(0, 0);
-    }
-
-    window.resetCourseForm = () => {
-        resetFormState('form-course', 'course-form-title', "Add New Course", 'btn-course-text', "Publish Course", 'btn-course-cancel');
-        document.getElementById('cCurrentImageURL').value = '';
-        document.getElementById('cFile').required = true;
-        document.getElementById('cFileHelp').classList.add('hidden');
-        document.getElementById('btn-course').disabled = false;
-    }
-    window.editCourse = (key, data) => {
-        setupEditState('course-form-title', 'Edit Course', 'btn-course-text', 'Update Course', 'btn-course-cancel');
-        document.getElementById('cEditKey').value = key;
-        document.getElementById('cTitle').value = data.title;
-        document.getElementById('cCategory').value = data.category;
-        document.getElementById('cDuration').value = data.duration;
-        document.getElementById('cStudents').value = data.students;
-        document.getElementById('cPopular').checked = data.isPopular || false;
-        document.getElementById('cCurrentImageURL').value = data.imageURL;
-        document.getElementById('cFile').required = false;
-        document.getElementById('cFileHelp').classList.remove('hidden');
-        window.scrollTo(0, 0);
-    }
+    // Webinars List
+    onValue(ref(db, 'content/webinars'), (s) => render('webinar-list-container', s.val(), (key, v) => `
+         <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex justify-between items-center gap-3">
+            <div><h4 class="font-bold text-slate-800">${v.title}</h4><p class="text-[11px] font-bold text-indigo-600 mt-0.5">${v.dateInfo}</p></div>
+            <div class="flex gap-1 shrink-0">
+                <button onclick='editWebinar("${key}", ${JSON.stringify(v)})' class="p-2 text-slate-400 hover:text-indigo-600 bg-slate-50 rounded-lg"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+                <button onclick="deleteItem('content/webinars/${key}')" class="p-2 text-slate-400 hover:text-red-600 bg-slate-50 rounded-lg"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+            </div>
+        </div>`));
     
-    window.resetMcqBundleForm = () => resetFormState('form-mcq-bundle', 'mcq-bundle-form-title', "Create New Bundle", 'btn-mcq-bundle-text', "Create Bundle", 'btn-mcq-bundle-cancel');
-    window.editMcqBundle = (key, data) => {
-        setupEditState('mcq-bundle-form-title', 'Edit Bundle', 'btn-mcq-bundle-text', 'Update Bundle', 'btn-mcq-bundle-cancel');
-        document.getElementById('mEditKey').value = key;
-        document.getElementById('mTitle').value = data.title;
-        document.getElementById('mTopic').value = data.topic;
-        document.getElementById('mTotal').value = data.totalQs;
-        document.getElementById('mIcon').value = data.icon;
-        window.scrollTo(0, 0);
-    }
+    // Why Choose Us List
+    onValue(ref(db, 'content/whyChooseUs'), (s) => render('why-list-container', s.val(), (key, v) => `
+        <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex flex-col justify-between">
+            <div><h4 class="font-bold text-slate-800 text-sm mb-1">${v.headline}</h4><p class="text-[11px] text-slate-500 line-clamp-3">${v.details}</p></div>
+            <div class="flex gap-2 mt-3 justify-end border-t border-slate-100 pt-2">
+                <button onclick='editWhyItem("${key}", ${JSON.stringify(v)})' class="text-xs font-bold text-indigo-600 px-2 py-1 hover:bg-indigo-50 rounded">Edit</button>
+                <button onclick="deleteItem('content/whyChooseUs/${key}')" class="text-xs font-bold text-red-600 px-2 py-1 hover:bg-red-50 rounded">Delete</button>
+            </div>
+        </div>`));
 
-    window.resetMcqQuestionForm = () => resetFormState('form-mcq-question', 'mcq-question-form-title', "Add New Question", 'btn-mcq-question-text', "Add Question", 'btn-mcq-question-cancel');
-    window.editMcqQuestion = (key, data) => {
-        setupEditState('mcq-question-form-title', 'Edit Question', 'btn-mcq-question-text', 'Update Question', 'btn-mcq-question-cancel');
-        document.getElementById('qEditKey').value = key;
-        document.getElementById('qText').value = data.question;
-        document.getElementById('qOptA').value = data.options.a;
-        document.getElementById('qOptB').value = data.options.b;
-        document.getElementById('qOptC').value = data.options.c;
-        document.getElementById('qOptD').value = data.options.d;
-        document.querySelector(`input[name="correctAnswer"][value="${data.correctAnswer}"]`).checked = true;
-        document.getElementById('page-mcq-questions').scrollTo(0, 0);
-    }
+    // Social Links List
+    onValue(ref(db, 'content/socialLinks'), (s) => render('social-list-container', s.val(), (key, v) => `
+        <div class="bg-white border border-slate-200 p-3 rounded-xl shadow-sm flex justify-between items-center gap-3">
+            <div class="overflow-hidden"><h4 class="font-bold text-slate-800 text-sm">${v.platform}</h4><p class="text-[10px] text-slate-400 truncate">${v.url}</p></div>
+            <div class="flex gap-1 shrink-0">
+                <button onclick='editSocialLink("${key}", ${JSON.stringify(v)})' class="p-1.5 text-slate-400 hover:text-indigo-600 bg-slate-50 rounded-lg"><span class="material-symbols-outlined text-[16px]">edit</span></button>
+                <button onclick="deleteItem('content/socialLinks/${key}')" class="p-1.5 text-slate-400 hover:text-red-600 bg-slate-50 rounded-lg"><span class="material-symbols-outlined text-[16px]">delete</span></button>
+            </div>
+        </div>`));
 
-    window.resetWebinarForm = () => resetFormState('form-webinar', 'webinar-form-title', "Add New Webinar", 'btn-webinar-text', "Add Webinar", 'btn-webinar-cancel');
-    window.editWebinar = (key, data) => {
-        setupEditState('webinar-form-title', 'Edit Webinar', 'btn-webinar-text', 'Update Webinar', 'btn-webinar-cancel');
-        document.getElementById('wEditKey').value = key;
-        document.getElementById('wTitle').value = data.title;
-        document.getElementById('wDateInfo').value = data.dateInfo;
-        document.getElementById('wYoutube').value = data.youtubeLink;
-        window.scrollTo(0, 0);
-    }
 
-    window.resetWhyForm = () => resetFormState('form-why', 'why-form-title', "Add a New Point", 'btn-why-text', "Add Point", 'btn-why-cancel');
-    window.editWhyItem = (key, data) => {
-        setupEditState('why-form-title', 'Edit Point', 'btn-why-text', 'Update Point', 'btn-why-cancel');
-        document.getElementById('whyEditKey').value = key;
-        document.getElementById('whyHeadline').value = data.headline;
-        document.getElementById('whyDetails').value = data.details;
-    }
+    // --- FORM EDIT & RESET LOGIC ---
+    const setupEdit = (tId, title, btnId, btnTxt, cancelId) => { document.getElementById(tId).textContent=title; document.getElementById(btnId).textContent=btnTxt; document.getElementById(cancelId).classList.remove('hidden'); }
+    const resetForm = (fId, tId, title, btnId, btnTxt, cancelId) => { document.getElementById(fId).reset(); document.getElementById(tId).textContent=title; document.getElementById(btnId).textContent=btnTxt; document.getElementById(cancelId).classList.add('hidden'); const h = document.querySelector(`#${fId} input[type="hidden"]`); if(h) h.value=''; }
 
-    window.resetSocialForm = () => resetFormState('form-social', 'social-form-title', "Add a New Link", 'btn-social-text', "Add Link", 'btn-social-cancel');
-    window.editSocialLink = (key, data) => {
-        setupEditState('social-form-title', 'Edit Link', 'btn-social-text', 'Update Link', 'btn-social-cancel');
-        document.getElementById('socialEditKey').value = key;
-        document.getElementById('sPlatform').value = data.platform;
-        document.getElementById('sUrl').value = data.url;
-    }
+    window.resetCaseStudyForm = () => resetForm('form-case-study','cs-form-title',"Add New Case Study",'btn-cs-text',"Create Module",'btn-cs-cancel');
+    window.editCaseStudy = (k, d) => { setupEdit('cs-form-title','Edit Module','btn-cs-text','Update Module','btn-cs-cancel'); document.getElementById('csEditKey').value=k; document.getElementById('csTitle').value=d.title; document.getElementById('csTopic').value=d.topic; document.getElementById('csPremium').checked=d.isPremium; }
 
-    resetTestimonialForm();
-    resetCourseForm();
+    window.resetTestimonialForm = () => { resetForm('form-testimonial','testimonial-form-title',"Add Testimonial",'btn-testimonial-text',"Save Review",'btn-testimonial-cancel'); document.getElementById('tCurrentImageURL').value=''; document.getElementById('tFile').required=true; document.getElementById('tFileHelp').classList.add('hidden'); }
+    window.editTestimonial = (k, d) => { setupEdit('testimonial-form-title','Edit Review','btn-testimonial-text','Update Review','btn-testimonial-cancel'); document.getElementById('tEditKey').value=k; document.getElementById('tName').value=d.name; document.getElementById('tReview').value=d.review; document.getElementById('tCurrentImageURL').value=d.imageURL; document.getElementById('tFile').required=false; document.getElementById('tFileHelp').classList.remove('hidden'); }
+
+    window.resetCourseForm = () => { resetForm('form-course','course-form-title',"Create New Course",'btn-course-text',"Publish Course",'btn-course-cancel'); document.getElementById('cCurrentImageURL').value=''; document.getElementById('cFile').required=true; document.getElementById('cFileHelp').classList.add('hidden'); }
+    window.editCourse = (k, d) => { setupEdit('course-form-title','Edit Course','btn-course-text','Update Course','btn-course-cancel'); document.getElementById('cEditKey').value=k; document.getElementById('cTitle').value=d.title; document.getElementById('cCategory').value=d.category; document.getElementById('cDuration').value=d.duration; document.getElementById('cStudents').value=d.students; document.getElementById('cPopular').checked=d.isPopular; document.getElementById('cCurrentImageURL').value=d.imageURL; document.getElementById('cFile').required=false; document.getElementById('cFileHelp').classList.remove('hidden'); }
+    
+    window.resetMcqBundleForm = () => resetForm('form-mcq-bundle','mcq-bundle-form-title',"Create Bundle",'btn-mcq-bundle-text',"Save Bundle",'btn-mcq-bundle-cancel');
+    window.editMcqBundle = (k, d) => { setupEdit('mcq-bundle-form-title','Edit Bundle','btn-mcq-bundle-text','Update Bundle','btn-mcq-bundle-cancel'); document.getElementById('mEditKey').value=k; document.getElementById('mTitle').value=d.title; document.getElementById('mTopic').value=d.topic; document.getElementById('mTotal').value=d.totalQs; document.getElementById('mIcon').value=d.icon; }
+
+    window.resetMcqQuestionForm = () => resetForm('form-mcq-question','mcq-question-form-title',"Add Question",'btn-mcq-question-text',"Save Question",'btn-mcq-question-cancel');
+    window.editMcqQuestion = (k, d) => { setupEdit('mcq-question-form-title','Edit Question','btn-mcq-question-text','Update Question','btn-mcq-question-cancel'); document.getElementById('qEditKey').value=k; document.getElementById('qText').value=d.question; document.getElementById('qOptA').value=d.options.a; document.getElementById('qOptB').value=d.options.b; document.getElementById('qOptC').value=d.options.c; document.getElementById('qOptD').value=d.options.d; document.querySelector(`input[name="correctAnswer"][value="${d.correctAnswer}"]`).checked=true; }
+
+    window.resetWebinarForm = () => resetForm('form-webinar','webinar-form-title',"Add Session",'btn-webinar-text',"Publish Webinar",'btn-webinar-cancel');
+    window.editWebinar = (k, d) => { setupEdit('webinar-form-title','Edit Session','btn-webinar-text','Update Webinar','btn-webinar-cancel'); document.getElementById('wEditKey').value=k; document.getElementById('wTitle').value=d.title; document.getElementById('wDateInfo').value=d.dateInfo; document.getElementById('wYoutube').value=d.youtubeLink; }
+
+    window.resetWhyForm = () => resetForm('form-why','why-form-title',"Add Card",'btn-why-text',"Save Point",'btn-why-cancel');
+    window.editWhyItem = (k, d) => { setupEdit('why-form-title','Edit Point','btn-why-text','Update Point','btn-why-cancel'); document.getElementById('whyEditKey').value=k; document.getElementById('whyHeadline').value=d.headline; document.getElementById('whyDetails').value=d.details; }
+
+    window.resetSocialForm = () => resetForm('form-social','social-form-title',"Add Link",'btn-social-text',"Save Link",'btn-social-cancel');
+    window.editSocialLink = (k, d) => { setupEdit('social-form-title','Edit Link','btn-social-text','Update Link','btn-social-cancel'); document.getElementById('socialEditKey').value=k; document.getElementById('sPlatform').value=d.platform; document.getElementById('sUrl').value=d.url; }
 
 </script>
 </body>
