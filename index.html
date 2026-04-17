@@ -124,7 +124,6 @@
             overflow: hidden;
         }
         
-        /* NEW: Chatbot Animations */
         @keyframes chatPop {
             0% { transform: scale(0.8); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
@@ -168,7 +167,7 @@
         </div>
     </div>
 
-    <!-- NEW: FINZO PREMIUM LOCK MODAL (Redirects to Iccha) -->
+    <!-- PREMIUM LOCK MODAL -->
     <div id="premiumLockModal" class="fixed inset-0 z-[999] hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 text-center relative overflow-hidden chat-animate">
             <button onclick="closePremiumModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-800 bg-slate-100 rounded-full p-1 transition-colors">
@@ -247,45 +246,24 @@
                 </div>
             </div>
 
-            <!-- NEW: CASE-BASED MOCKTESTS (First free, rest paid 500) -->
-            <section class="mb-8">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="font-headline text-2xl font-extrabold text-primary tracking-tight">Case-Based Mocktests</h2>
-                    <p class="text-slate-500 text-xs font-medium">Analyze real scenarios</p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- FREE CASE STUDY -->
-                    <div class="bg-white border border-slate-200 rounded-xl p-4 flex gap-4 items-center shadow-sm hover:shadow-md transition-shadow cursor-pointer" onclick="openFreeCaseStudy()">
-                        <div class="w-16 h-16 rounded-lg bg-green-100 text-green-700 flex items-center justify-center shrink-0">
-                            <span class="material-symbols-outlined text-3xl">auto_stories</span>
-                        </div>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-primary">Case Study 1: Fundamentals</h3>
-                            <p class="text-xs text-slate-500 mb-2">Internal Audit basics & scenarios.</p>
-                            <span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded uppercase">FREE</span>
-                        </div>
-                    </div>
-                    <!-- PAID CASE STUDY -->
-                    <div class="bg-white border border-slate-200 rounded-xl p-4 flex gap-4 items-center shadow-sm hover:shadow-md transition-shadow cursor-pointer" onclick="openPremiumCaseStudy()">
-                        <div class="w-16 h-16 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center shrink-0 border border-orange-100 relative">
-                            <span class="material-symbols-outlined text-3xl">lock</span>
-                        </div>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-primary">Case Study 2: Advanced Risk</h3>
-                            <p class="text-xs text-slate-500 mb-2">Complex enterprise risk handling.</p>
-                            <span class="bg-orange-100 text-orange-700 text-[10px] font-bold px-2 py-1 rounded uppercase">PREMIUM</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Success Stories -->
+            <!-- Success Stories (Moved ABOVE Case Studies) -->
             <section class="mb-8">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="font-headline text-2xl font-extrabold text-primary tracking-tight">Success Stories</h2>
                     <p class="text-slate-500 text-xs font-medium">From our Toppers</p>
                 </div>
                 <div id="testimonials-container" class="flex overflow-x-auto gap-3 testimonial-scroller pb-3 -mx-4 px-4 md:mx-0 md:px-0"></div>
+            </section>
+
+            <!-- Case-Based Mocktests (Dynamic fetching replacing prototype) -->
+            <section class="mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="font-headline text-2xl font-extrabold text-primary tracking-tight">Case-Based Mocktests</h2>
+                    <p class="text-slate-500 text-xs font-medium">Analyze real scenarios</p>
+                </div>
+                <div id="dynamic-case-studies" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Case Studies will be injected here from Firebase -->
+                </div>
             </section>
             
             <!-- Elevate Career Banner -->
@@ -331,15 +309,13 @@
                 </div>
             </section>
 
-            <!-- Why Choose Us - DYNAMIC -->
+            <!-- Why Choose Us -->
             <section class="mb-12">
                 <div class="flex flex-col md:flex-row justify-between items-end mb-4 gap-2">
                     <h2 id="why-choose-us-title" class="font-headline text-2xl font-extrabold text-primary max-w-md tracking-tight">Why Choose Us?</h2>
                     <p id="why-choose-us-desc" class="text-on-surface-variant max-w-md text-xs border-l-[3px] border-secondary pl-3">World-class education for tangible career outcomes.</p>
                 </div>
-                <div id="why-choose-us-cards" class="flex overflow-x-auto gap-4 hide-scrollbar pb-3 -mx-4 px-4 md:mx-0 md:px-0">
-                    <!-- Cards from Firebase will be here -->
-                </div>
+                <div id="why-choose-us-cards" class="flex overflow-x-auto gap-4 hide-scrollbar pb-3 -mx-4 px-4 md:mx-0 md:px-0"></div>
             </section>
         </div>
 
@@ -353,9 +329,7 @@
                 <div id="wcu-detail-icon" class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 text-primary">
                     <span class="material-symbols-outlined text-4xl">star</span>
                 </div>
-                <div id="wcu-detail-content" class="text-slate-700 leading-relaxed text-sm space-y-4">
-                    <!-- Full description here -->
-                </div>
+                <div id="wcu-detail-content" class="text-slate-700 leading-relaxed text-sm space-y-4"></div>
             </div>
         </div>
 
@@ -364,34 +338,32 @@
             <div class="mb-4 text-center md:text-left mt-2"><h1 class="font-headline text-3xl font-extrabold text-primary mb-1">Academic Programs</h1><p class="text-slate-600 text-xs max-w-lg">Find the perfect professional certification.</p></div>
             <div id="all-courses-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8"></div>
         </div>
+        
         <div id="webinarsPage" class="page">
             <div class="mb-6 mt-2"><h1 class="font-headline text-3xl font-extrabold text-primary mb-1">Knowledge Sessions</h1></div>
              <section class="mb-8"><div id="past-webinars-list" class="space-y-3"></div></section>
         </div>
+        
         <div id="mcqPage" class="page">
-            <div class="mb-6 mt-2"><h1 class="font-headline text-3xl font-extrabold text-primary mb-1">Practice MCQs</h1></div>
-             <!-- Mocktest Entry Point (PROTOTYPE LAUNCHER) -->
-             <div class="bg-primary text-white p-6 rounded-2xl shadow-lg mb-8 relative overflow-hidden cursor-pointer hover:shadow-xl transition-all" onclick="startPrototypeQuiz()">
-                <div class="absolute -right-4 -top-4 opacity-20"><span class="material-symbols-outlined text-[120px]">quiz</span></div>
-                <div class="relative z-10">
-                    <h3 class="text-2xl font-bold font-headline mb-2">General Mocktest Series</h3>
-                    <p class="text-slate-300 text-sm mb-4">Practice 50+ questions. First 10 questions are FREE!</p>
-                    <button class="bg-secondary text-primary font-bold py-2 px-6 rounded-lg text-sm shadow-md">Start Quiz Now</button>
-                </div>
+            <div class="mb-6 mt-2"><h1 class="font-headline text-3xl font-extrabold text-primary mb-1">Practice MCQs</h1><p class="text-slate-600 text-xs mt-1">Select a bundle below to start practicing.</p></div>
+             
+             <!-- Dynamic MCQ Bundles Container -->
+             <div id="mcq-bundles-dynamic-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <!-- Data fetched from Firebase will appear here -->
              </div>
-             <div id="mcq-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8"></div>
         </div>
         
-        <!-- MODIFIED: MCQ QUIZ PLAYER UI (PROTOTYPE) -->
+        <!-- DYNAMIC MCQ QUIZ PLAYER UI -->
         <div id="mcqQuizPage" class="page">
             <div class="flex items-center gap-3 mb-6 mt-2">
                 <button onclick="showPage('mcqPage')" class="w-8 h-8 bg-white border border-slate-200 rounded-full flex items-center justify-center text-primary shadow-sm"><span class="material-symbols-outlined text-sm">arrow_back</span></button>
                 <h1 class="font-headline text-xl font-extrabold text-primary">Live Quiz</h1>
             </div>
             <div id="quiz-player-container" class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                <!-- Quiz will render here -->
+                <!-- Dynamic Quiz Question renders here -->
             </div>
         </div>
+        
         <div id="mcqResultPage" class="page"><div id="quiz-result-container"></div></div>
         
         <div id="profilePage" class="page">
@@ -412,15 +384,16 @@
                 <span class="material-symbols-outlined text-lg">logout</span> Secure Logout
             </a>
         </div>
+        
         <div id="notificationsPage" class="page"><div class="flex items-center gap-3 mb-6 mt-2"><button onclick="history.back()" class="w-8 h-8 bg-white border border-slate-200 rounded-full flex items-center justify-center text-primary"><span class="material-symbols-outlined text-sm">arrow_back</span></button><h1 class="font-headline text-2xl font-extrabold text-primary">Notifications</h1></div></div>
+        
         <div id="courseDetailsPage" class="page"><h1 class="font-headline text-3xl font-extrabold text-primary">Course Details</h1><p>Coming Soon...</p></div>
 
     </main>
 
-    <!-- NEW: FLOATING EXPERT CHATBOT (5 queries free, then 300 Rs for 10 min) -->
+    <!-- FLOATING EXPERT CHATBOT -->
     <button id="chat-fab" onclick="toggleChatWindow()" class="fixed bottom-24 right-4 z-40 bg-primary text-white w-14 h-14 rounded-full shadow-xl flex items-center justify-center hover:scale-105 transition-transform border-2 border-secondary">
         <span class="material-symbols-outlined text-3xl">support_agent</span>
-        <!-- Notification dot -->
         <span class="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border border-white"></span>
     </button>
 
@@ -456,7 +429,6 @@
     <script>
         const pages = document.querySelectorAll('.page');
         const navLinks = document.querySelectorAll('.bottom-nav-link');
-        let currentQuizState = {};
 
         window.showPage = function(pageId) {
             pages.forEach(page => page.classList.remove('active'));
@@ -519,7 +491,6 @@
             modal.classList.remove('flex');
         };
 
-        // NEW: Chat Window Toggle
         window.toggleChatWindow = function() {
             const chatWin = document.getElementById('chat-window');
             if(chatWin.classList.contains('hidden')) {
@@ -531,7 +502,6 @@
             }
         };
 
-        // NEW: Premium Lock Modal Handlers
         let currentPendingPlan = null;
         window.openPremiumModal = function(planId, amount, title, desc) {
             document.getElementById('lock-title').textContent = title;
@@ -554,7 +524,6 @@
             if(!mobile) { alert('Session Error: Please login again.'); return; }
             if(!currentPendingPlan) return;
             
-            // Redirect to Iccha platform for payment
             const icchaUrl = `https://shubhzone.shop/?from=finzo&plan=${currentPendingPlan}&mobile=${mobile}`;
             window.location.href = icchaUrl;
         });
@@ -564,7 +533,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue, set, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, onValue, set, update, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB4jDUkGOAtZDzWfQ-KKTPGlLu05NdMQMU",
@@ -578,7 +547,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Global User Data to manage limits
         window.currentUserData = {
             freeMcqsUsed: 0,
             freeChatQueriesUsed: 0,
@@ -586,7 +554,6 @@
             unlockedPackages: {}
         };
 
-        // --- IMGBB CONFIG ---
         const IMGBB_API_KEY = "fd8aac95aef4d58beb74e4df53c545df";
         async function uploadImageToImgBB(file) {
             const formData = new FormData();
@@ -602,7 +569,6 @@
             }
         }
 
-        // --- PROFILE LOGIC ---
         function updateProfileUI(userProfile) {
             document.getElementById('header-profile-pic').src = userProfile.pic || 'https://i.ibb.co/6y1L1Ym/default-avatar.png';
             document.getElementById('header-profile-name').textContent = userProfile.name.split(' ')[0];
@@ -615,14 +581,12 @@
             const loggedInMobile = localStorage.getItem('userMobile');
             
             if (loggedInMobile) {
-                // Continuous listener to auto-unlock features if payment is done
                 onValue(ref(db, `users/${loggedInMobile}`), (snapshot) => {
                     if (snapshot.exists()) {
                         const userProfile = snapshot.val();
                         updateProfileUI(userProfile);
                         document.getElementById('onboardingModal').style.display = 'none';
                         
-                        // Sync tracking data globally
                         window.currentUserData = userProfile;
                         if(window.currentUserData.freeMcqsUsed === undefined) window.currentUserData.freeMcqsUsed = 0;
                         if(window.currentUserData.freeChatQueriesUsed === undefined) window.currentUserData.freeChatQueriesUsed = 0;
@@ -668,7 +632,6 @@
                 mobile: document.getElementById('userMobile').value,
                 address: document.getElementById('userAddress').value,
                 pic: imageUrl,
-                // Init tracker fields
                 freeMcqsUsed: 0,
                 freeChatQueriesUsed: 0,
                 premiumChatEndTime: 0,
@@ -690,30 +653,27 @@
 
         document.addEventListener('DOMContentLoaded', loadUserProfile);
 
-        // --- NEW: CHATBOT LOGIC (5 free, then 300 Rs/10 mins) ---
+        // --- CHATBOT ---
         window.sendChatMessage = function() {
             const input = document.getElementById('chat-input');
             const msg = input.value.trim();
             if(!msg) return;
 
-            // Check Limits
             const data = window.currentUserData;
             let canChat = false;
 
             if (data.freeChatQueriesUsed < 5) {
                 canChat = true;
             } else if (Date.now() < data.premiumChatEndTime) {
-                canChat = true; // Has active 10 min pass
+                canChat = true; 
             }
 
             if (!canChat) {
-                // Trigger Lock
                 window.toggleChatWindow();
                 window.openPremiumModal('chat_10min', 300, 'Expert Chat Consultation', 'Your 5 free queries are over. Get 10 minutes of uninterrupted expert support.');
                 return;
             }
 
-            // Allowed to chat: Update UI
             const chatBox = document.getElementById('chat-messages');
             chatBox.innerHTML += `
                 <div class="flex items-start gap-2 justify-end mt-3">
@@ -722,13 +682,11 @@
                 </div>`;
             input.value = '';
 
-            // Update Database if using free tier
             if (data.freeChatQueriesUsed < 5 && Date.now() >= data.premiumChatEndTime) {
                 const mobile = localStorage.getItem('userMobile');
                 update(ref(db, `users/${mobile}`), { freeChatQueriesUsed: data.freeChatQueriesUsed + 1 });
             }
 
-            // Dummy Expert Reply
             setTimeout(() => {
                 chatBox.innerHTML += `
                 <div class="flex items-start gap-2 mt-3">
@@ -739,73 +697,144 @@
             }, 1000);
         }
 
-        // --- NEW: CASE STUDY LOGIC ---
-        window.openFreeCaseStudy = function() {
-            alert("Opening Free Case Study 1: Fundamentals... (Prototype)");
+        // --- DYNAMIC CASE STUDIES ---
+        onValue(ref(db, 'content/caseStudies'), (snapshot) => {
+            const container = document.getElementById('dynamic-case-studies');
+            if (snapshot.exists()) {
+                let html = '';
+                Object.entries(snapshot.val()).forEach(([key, val]) => {
+                    if (val.isPremium) {
+                        html += `
+                        <div class="bg-white border border-slate-200 rounded-xl p-4 flex gap-4 items-center shadow-sm hover:shadow-md transition-shadow cursor-pointer" onclick="openPremiumCaseStudy('${key}')">
+                            <div class="w-16 h-16 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center shrink-0 border border-orange-100 relative">
+                                <span class="material-symbols-outlined text-3xl">lock</span>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-primary">${val.title}</h3>
+                                <p class="text-xs text-slate-500 mb-2">${val.topic}</p>
+                                <span class="bg-orange-100 text-orange-700 text-[10px] font-bold px-2 py-1 rounded uppercase">PREMIUM</span>
+                            </div>
+                        </div>`;
+                    } else {
+                        html += `
+                        <div class="bg-white border border-slate-200 rounded-xl p-4 flex gap-4 items-center shadow-sm hover:shadow-md transition-shadow cursor-pointer" onclick="openFreeCaseStudy('${key}')">
+                            <div class="w-16 h-16 rounded-lg bg-green-100 text-green-700 flex items-center justify-center shrink-0">
+                                <span class="material-symbols-outlined text-3xl">auto_stories</span>
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-primary">${val.title}</h3>
+                                <p class="text-xs text-slate-500 mb-2">${val.topic}</p>
+                                <span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded uppercase">FREE</span>
+                            </div>
+                        </div>`;
+                    }
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = `<p class="text-sm text-slate-500 col-span-2 text-center py-4 bg-white rounded-xl border border-slate-200 shadow-sm">No Case Studies Available right now.</p>`;
+            }
+        });
+
+        window.openFreeCaseStudy = function(caseKey) {
+            alert("Opening Free Case Study Module... (Database ID: " + caseKey + ")");
         };
 
-        window.openPremiumCaseStudy = function() {
+        window.openPremiumCaseStudy = function(caseKey) {
             if(window.currentUserData.unlockedPackages && window.currentUserData.unlockedPackages['case_study']) {
-                alert("Premium Case Study 2 unlocked successfully! Loading content...");
+                alert("Premium Case Study unlocked successfully! Loading content... (Database ID: " + caseKey + ")");
             } else {
                 window.openPremiumModal('case_study', 500, 'Premium Case Studies', 'Unlock advanced scenario analysis & real-world mock cases to boost your career.');
             }
         };
 
-        // --- NEW: PROTOTYPE MCQ LOGIC (10 free, then 250 Rs lock) ---
-        const prototypeQuestions = Array.from({length: 15}, (_, i) => ({
-            q: `Sample Audit Question Number ${i + 1}?`,
-            opts: ['Option A', 'Option B', 'Option C', 'Option D'],
-            ans: 0
-        }));
-        
-        let currentQIndex = 0;
+        // --- DYNAMIC MCQS (Admin Panel Connected) ---
+        onValue(ref(db, 'content/mcqs'), (snapshot) => {
+            const container = document.getElementById('mcq-bundles-dynamic-container');
+            if(snapshot.exists()) {
+                let html = '';
+                Object.entries(snapshot.val()).forEach(([key, val]) => {
+                    html += `
+                    <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col items-start gap-3" onclick="startDynamicQuiz('${key}', '${val.title}')">
+                        <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                            <span class="material-symbols-outlined text-3xl">${val.icon || 'quiz'}</span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-primary font-headline">${val.title}</h3>
+                            <p class="text-xs text-slate-500 mb-3">${val.topic} • ${val.totalQs} Questions</p>
+                        </div>
+                        <button class="w-full bg-secondary text-primary font-bold py-2 rounded-lg text-sm shadow-sm mt-auto">Start Quiz</button>
+                    </div>`;
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = `<p class="text-sm text-slate-500 text-center py-4 col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm">No MCQ Bundles Available.</p>`;
+            }
+        });
 
-        window.startPrototypeQuiz = function() {
-            currentQIndex = 0;
-            window.showPage('mcqQuizPage');
-            renderCurrentQuestion();
+        window.currentQuizQuestions = [];
+        window.currentQIndex = 0;
+        window.currentQuizTitle = "";
+
+        window.startDynamicQuiz = function(bundleKey, bundleTitle) {
+            get(ref(db, `content/mcqQuestions/${bundleKey}`)).then((snapshot) => {
+                if(snapshot.exists()) {
+                    window.currentQuizQuestions = Object.values(snapshot.val());
+                    window.currentQIndex = 0;
+                    window.currentQuizTitle = bundleTitle;
+                    window.showPage('mcqQuizPage');
+                    renderDynamicQuestion();
+                } else {
+                    alert("No questions found in this bundle. Check back later.");
+                }
+            }).catch(error => {
+                alert("Error loading quiz data. Try again.");
+            });
         }
 
-        window.renderCurrentQuestion = function() {
-            // Check limits before showing question
+        window.renderDynamicQuestion = function() {
             const data = window.currentUserData;
             
-            // If trying to access 11th question (index 10) and NO package unlocked
-            if (currentQIndex >= 10 && (!data.unlockedPackages || !data.unlockedPackages['mcq_test'])) {
-                window.openPremiumModal('mcq_test', 250, 'Full Mocktest Series', 'You have exhausted your 10 free questions. Unlock the remaining 40+ questions now.');
-                window.showPage('mcqPage'); // kick back to listing
+            // Check Free limits (First 10 questions free)
+            if (window.currentQIndex >= 10 && (!data.unlockedPackages || !data.unlockedPackages['mcq_test'])) {
+                window.openPremiumModal('mcq_test', 250, 'Full Mocktest Series', 'You have exhausted your 10 free questions. Unlock the remaining questions now.');
+                window.showPage('mcqPage');
                 return;
             }
 
-            const qData = prototypeQuestions[currentQIndex];
+            const qData = window.currentQuizQuestions[window.currentQIndex];
             if(!qData) {
-                document.getElementById('quiz-player-container').innerHTML = `<h3 class="text-xl font-bold text-center py-10 text-green-600">Quiz Completed!</h3>`;
+                document.getElementById('quiz-player-container').innerHTML = `
+                    <div class="text-center py-10">
+                        <span class="material-symbols-outlined text-green-500 text-6xl mb-2">task_alt</span>
+                        <h3 class="text-2xl font-bold font-headline text-primary mb-1">Quiz Completed!</h3>
+                        <p class="text-slate-500 text-sm">You have answered all available questions.</p>
+                        <button onclick="showPage('mcqPage')" class="mt-6 bg-primary text-white font-bold py-2 px-6 rounded-lg">Return to Modules</button>
+                    </div>`;
                 return;
             }
+
+            // Options mapped from admin structure {a: "...", b: "...", c: "...", d: "..."}
+            const optionsHtml = Object.entries(qData.options).map(([optKey, optText]) => {
+                return `<button onclick="nextDynamicQuestion()" class="w-full text-left p-4 rounded-xl border border-slate-200 hover:border-primary hover:bg-primary/5 transition-all text-sm font-medium text-slate-700">${optText}</button>`;
+            }).join('');
 
             const html = `
                 <div class="flex justify-between items-center mb-4">
-                    <span class="text-sm font-bold text-slate-400">Question ${currentQIndex + 1} of ${prototypeQuestions.length}</span>
-                    <span class="bg-primary/10 text-primary text-xs font-bold px-2 py-1 rounded">Mocktest Series</span>
+                    <span class="text-sm font-bold text-slate-400">Question ${window.currentQIndex + 1} of ${window.currentQuizQuestions.length}</span>
+                    <span class="bg-primary/10 text-primary text-xs font-bold px-2 py-1 rounded max-w-[120px] truncate">${window.currentQuizTitle}</span>
                 </div>
-                <h3 class="text-lg font-bold text-slate-800 mb-6">${qData.q}</h3>
+                <h3 class="text-lg font-bold text-slate-800 mb-6">${qData.question}</h3>
                 <div class="space-y-3">
-                    ${qData.opts.map((opt, i) => `
-                        <button onclick="nextPrototypeQuestion()" class="w-full text-left p-4 rounded-xl border border-slate-200 hover:border-primary hover:bg-primary/5 transition-all text-sm font-medium text-slate-700">${opt}</button>
-                    `).join('')}
+                    ${optionsHtml}
                 </div>
             `;
             document.getElementById('quiz-player-container').innerHTML = html;
         }
 
-        window.nextPrototypeQuestion = function() {
-            currentQIndex++;
-            renderCurrentQuestion();
+        window.nextDynamicQuestion = function() {
+            window.currentQIndex++;
+            renderDynamicQuestion();
         }
-
-
-        // --- FETCH DATA ---
 
         // Hero Slider
         onValue(ref(db, 'content/heroSlider'), (s) => {
@@ -822,7 +851,6 @@
             if (s.exists()) {
                 const data = s.val();
                 let h = '';
-                // Since admin pushes points as { headline, details }
                 Object.entries(data).forEach(([id, card]) => {
                     if(card.headline && card.details) {
                         h += `
@@ -855,10 +883,10 @@
             }, { onlyOnce: true });
         };
 
-        // Testimonials (Toppers) Updated Format
+        // Testimonials
         onValue(ref(db, 'content/testimonials'), (s) => {
             if (s.exists()) {
-                window.testimonialsData = s.val(); // Store globally for Modal usage
+                window.testimonialsData = s.val(); 
                 let h = '';
                 Object.entries(s.val()).forEach(([id, v]) => {
                     h += `<div class="min-w-[240px] w-[240px] bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm shrink-0 flex flex-col hover-lift transition-all">
@@ -887,9 +915,7 @@
             if (s.exists()) {
                 let ph = '', ah = '';
                 Object.values(s.val()).forEach(c => {
-                    // Ready for Admin course icon future update
                     const iconOverlay = c.courseIcon ? `<div class="absolute top-2 left-2 bg-white/90 backdrop-blur-md p-1.5 rounded-lg shadow-md border border-slate-200"><img src="${c.courseIcon}" class="w-6 h-6 object-contain" /></div>` : '';
-                    
                     const card = `<div class="min-w-[260px] bg-white border border-slate-200 rounded-xl overflow-hidden flex flex-col relative">
                         <div class="h-32 overflow-hidden relative">
                             <img class="w-full h-full object-cover" src="${c.imageURL}" />
