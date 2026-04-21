@@ -129,6 +129,7 @@
             100% { transform: scale(1); opacity: 1; }
         }
         .chat-animate { animation: chatPop 0.3s ease-out forwards; }
+        .blog-content { white-space: pre-line; }
     </style>
 </head>
 <body class="bg-slate-50 font-body text-on-background antialiased pb-20">
@@ -246,6 +247,9 @@
                 </div>
             </div>
 
+            <!-- NEW: Daily Update Section -->
+            <section id="daily-update-section" class="mb-8"></section>
+
             <!-- Success Stories (Moved ABOVE Case Studies) -->
             <section class="mb-8">
                 <div class="flex justify-between items-center mb-4">
@@ -290,6 +294,15 @@
                 <div id="home-popular-courses" class="flex overflow-x-auto gap-4 hide-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0"></div>
             </section>
             
+            <!-- NEW: Blog Section -->
+            <section class="mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="font-headline text-2xl font-extrabold text-primary tracking-tight">From the Blog</h2>
+                    <!-- Optional: View All button can be added here -->
+                </div>
+                <div id="home-blog-posts" class="flex overflow-x-auto gap-4 hide-scrollbar pb-2 -mx-4 px-4 md:mx-0 md:px-0"></div>
+            </section>
+
             <!-- Webinar Highlight Banner -->
             <section class="mb-8" id="home-highlight-webinar"></section>
             
@@ -344,6 +357,19 @@
             </div>
             <div class="mt-6 text-center text-xs font-bold text-slate-400 uppercase tracking-widest pb-8">End of Case Study</div>
         </div>
+        
+        <!-- NEW: Details Page for Blog Posts -->
+        <div id="blogDetailPage" class="page">
+            <div class="flex items-center gap-3 mb-6 pb-2 border-b border-slate-200 mt-2">
+                <button onclick="showPage('homePage')" class="w-8 h-8 bg-white border border-slate-200 rounded-full flex items-center justify-center text-primary shadow-sm"><span class="material-symbols-outlined text-sm">arrow_back</span></button>
+                <h1 class="font-headline text-2xl font-extrabold text-primary">Blog Post</h1>
+            </div>
+            <div id="blog-detail-content" class="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <!-- Dynamic content here -->
+            </div>
+             <div class="mt-6 text-center text-xs font-bold text-slate-400 uppercase tracking-widest pb-8">End of Post</div>
+        </div>
+
 
         <!-- OTHER PAGES -->
         <div id="coursesPage" class="page">
@@ -768,6 +794,74 @@
             }
         }
         // === AI CHANGE END ===
+        
+        // --- NEW: Daily Update ---
+        onValue(ref(db, 'content/dailyUpdate'), (snapshot) => {
+            const container = document.getElementById('daily-update-section');
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                container.innerHTML = `
+                    <div class="bg-gradient-to-tr from-primary to-[#39448e] text-white rounded-2xl p-6 shadow-xl shadow-primary/20 border-2 border-secondary/50">
+                        <div class="flex items-center gap-3 mb-3">
+                            <span class="material-symbols-outlined text-secondary text-3xl">campaign</span>
+                            <h2 class="font-headline text-2xl font-extrabold tracking-tight">Update Yourself</h2>
+                        </div>
+                        <h3 class="font-bold text-secondary text-lg mb-2">${data.title || 'Latest Announcement'}</h3>
+                        <p class="text-sm text-indigo-100 leading-relaxed">${data.message || 'Check back soon for new updates.'}</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = ''; 
+            }
+        });
+
+        // --- NEW: Blog Posts ---
+        onValue(ref(db, 'content/blogs'), (s) => {
+            const container = document.getElementById('home-blog-posts');
+            if (s.exists()) {
+                let html = '';
+                Object.entries(s.val()).forEach(([key, post]) => {
+                    html += `
+                    <div class="min-w-[280px] w-[280px] bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col hover-lift transition-all shadow-sm">
+                        <div class="h-40 bg-slate-100">
+                            <img src="${post.thumbnailURL || 'https://placehold.co/600x400/e2e8f0/e2e8f0'}" class="w-full h-full object-cover"/>
+                        </div>
+                        <div class="p-4 flex flex-col flex-grow">
+                            <h4 class="font-bold text-primary font-headline text-base mb-2 line-clamp-2">${post.title}</h4>
+                            <p class="text-xs text-slate-500 line-clamp-3 mb-4">${post.excerpt}</p>
+                            <button onclick="showBlogDetails('${key}')" class="mt-auto self-start bg-secondary text-primary font-extrabold py-2 px-4 rounded-lg text-xs">Read More</button>
+                        </div>
+                    </div>
+                    `;
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<p class="text-sm text-slate-500 w-full text-center py-4 bg-white rounded-xl border border-slate-200 shadow-sm">No blog posts available yet.</p>';
+            }
+        });
+
+        window.showBlogDetails = function(blogKey) {
+            get(ref(db, `content/blogs/${blogKey}`)).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const post = snapshot.val();
+                    const contentContainer = document.getElementById('blog-detail-content');
+                    contentContainer.innerHTML = `
+                        <img src="${post.thumbnailURL || 'https://placehold.co/1200x600/e2e8f0/e2e8f0'}" class="w-full aspect-video object-cover rounded-xl mb-6 border border-slate-200"/>
+                        <h2 class="text-3xl font-extrabold text-primary font-headline mb-3">${post.title}</h2>
+                        <div class="flex items-center gap-4 text-xs text-slate-500 font-medium mb-6 pb-4 border-b border-slate-200">
+                            <span>By: <strong class="text-slate-700">${post.author || 'Finzo Team'}</strong></span>
+                            <span>Date: <strong class="text-slate-700">${post.date || 'N/A'}</strong></span>
+                        </div>
+                        <div class="text-slate-700 leading-relaxed blog-content">${post.content || ''}</div>
+                    `;
+                    showPage('blogDetailPage');
+                } else {
+                    alert('Blog post not found.');
+                    showPage('homePage');
+                }
+            });
+        }
+
 
         // --- DYNAMIC CASE STUDIES ---
         onValue(ref(db, 'content/caseStudies'), (snapshot) => {
