@@ -80,6 +80,13 @@
         </a>
 
         <p class="px-6 text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-6 mb-2">Website Content</p>
+        <!-- NEW: Daily Updates & Blogs Menu -->
+        <a href="#" onclick="showPage('page-daily-update')" class="sidebar-link flex items-center gap-3 px-6 py-3 text-slate-500 hover:bg-slate-50 font-semibold text-sm">
+            <span class="material-symbols-outlined text-[20px]">campaign</span> Daily Update
+        </a>
+        <a href="#" onclick="showPage('page-blogs')" class="sidebar-link flex items-center gap-3 px-6 py-3 text-slate-500 hover:bg-slate-50 font-semibold text-sm">
+            <span class="material-symbols-outlined text-[20px]">article</span> Blog Posts
+        </a>
         <a href="#" onclick="showPage('page-slider')" class="sidebar-link flex items-center gap-3 px-6 py-3 text-slate-500 hover:bg-slate-50 font-semibold text-sm">
             <span class="material-symbols-outlined text-[20px]">view_carousel</span> Hero Slider
         </a>
@@ -209,6 +216,78 @@
                 <div id="user-empty-state" class="hidden p-12 text-center text-slate-500 font-medium">
                     <span class="material-symbols-outlined text-4xl text-slate-300 mb-2 block">group_off</span>
                     No users found in the database.
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW PAGE: Daily Update -->
+        <div id="page-daily-update" class="page">
+            <h2 class="text-2xl font-extrabold text-slate-900 mb-6 tracking-tight">Student Daily Updates (Update Yourself)</h2>
+            <div class="glass-card p-6 max-w-2xl">
+                <h3 class="font-extrabold text-lg mb-2 text-slate-800">Post a new update</h3>
+                <p class="text-xs text-slate-500 mb-6">This message will appear on the top of the user home page.</p>
+                <form id="form-daily-update" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Update Heading / Title</label>
+                        <input type="text" id="duTitle" placeholder="e.g., Exam Strategy 2024 or Syllabus Change" required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-sm text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Full Message</label>
+                        <textarea id="duMessage" rows="5" placeholder="Write your daily message or important information here..." required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-sm text-slate-800"></textarea>
+                    </div>
+                    <button type="submit" id="btn-daily-update" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/20">Publish Update Live</button>
+                    <button type="button" onclick="deleteItem('content/dailyUpdate')" class="w-full bg-red-50 hover:bg-red-100 text-red-600 font-bold py-3 rounded-xl transition-all mt-2">Remove Current Update</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- NEW PAGE: Blogs -->
+        <div id="page-blogs" class="page">
+            <h2 class="text-2xl font-extrabold text-slate-900 mb-6 tracking-tight">Manage Blog Posts</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-1 glass-card p-6 h-fit sticky top-6">
+                    <h3 id="blog-form-title" class="font-extrabold text-lg mb-4 text-slate-800">Add New Blog</h3>
+                    <form id="form-blog" class="space-y-4">
+                        <input type="hidden" id="bEditKey">
+                        <input type="hidden" id="bCurrentImageURL">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Blog Title</label>
+                            <input type="text" id="bTitle" placeholder="Enter title..." required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Author</label>
+                                <input type="text" id="bAuthor" placeholder="e.g., Admin" required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Date</label>
+                                <input type="text" id="bDate" placeholder="e.g., 20 Oct 2024" required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Short Excerpt</label>
+                            <textarea id="bExcerpt" rows="2" placeholder="Brief summary for home page..." required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Full Content</label>
+                            <textarea id="bContent" rows="6" placeholder="Write full blog here..." required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Thumbnail Image</label>
+                            <p id="bFileHelp" class="text-[10px] text-slate-400 mb-2 font-medium">Leave empty to keep current image.</p>
+                            <input type="file" id="bFile" accept="image/*" class="w-full text-xs text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                        </div>
+                        <div class="flex gap-2 pt-2">
+                            <button type="button" id="btn-blog-cancel" onclick="resetBlogForm()" class="hidden w-1/3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-4 rounded-xl transition-all">Cancel</button>
+                            <button type="submit" id="btn-blog" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/20"><span id="btn-blog-text">Publish Blog</span></button>
+                        </div>
+                    </form>
+                </div>
+                <div class="lg:col-span-2 glass-card p-6">
+                    <h3 class="font-extrabold text-lg mb-4 text-slate-800">Published Blogs</h3>
+                    <div id="blog-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Dynamic Blogs -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -606,6 +685,8 @@
             'page-dashboard': 'Dashboard Overview',
             'page-users': 'User Database',
             'page-case-studies': 'Case Studies Management',
+            'page-daily-update': 'Daily Update Management',
+            'page-blogs': 'Blog Posts Management',
             'page-slider': 'Hero Slider Management',
             'page-testimonials': 'Topper Reviews',
             'page-courses': 'Course Directory',
@@ -648,6 +729,50 @@
         resetCaseStudyForm();
     });
     
+    // NEW: Daily Update
+    document.getElementById('form-daily-update').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btn-daily-update');
+        btn.disabled = true; btn.textContent = 'Publishing...';
+        const data = {
+            title: document.getElementById('duTitle').value,
+            message: document.getElementById('duMessage').value
+        };
+        await set(ref(db, 'content/dailyUpdate'), data);
+        alert('Daily Update Published Successfully!');
+        btn.disabled = false; btn.textContent = 'Publish Update Live';
+    });
+
+    // NEW: Blogs
+    document.getElementById('form-blog').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btn-blog');
+        btn.disabled = true; document.getElementById('btn-blog-text').textContent = 'Saving...';
+        
+        const editKey = document.getElementById('bEditKey').value;
+        const file = document.getElementById('bFile').files[0];
+        let imageUrl = document.getElementById('bCurrentImageURL').value;
+
+        if (file) {
+            const newImageUrl = await uploadImageToImgBB(file);
+            if (newImageUrl) imageUrl = newImageUrl;
+            else { btn.disabled = false; return; }
+        }
+
+        const data = { 
+            title: document.getElementById('bTitle').value, 
+            author: document.getElementById('bAuthor').value, 
+            date: document.getElementById('bDate').value, 
+            excerpt: document.getElementById('bExcerpt').value, 
+            content: document.getElementById('bContent').value, 
+            thumbnailURL: imageUrl || '' 
+        };
+        
+        const path = 'content/blogs' + (editKey ? `/${editKey}` : '');
+        await (editKey ? set(ref(db, path), data) : push(ref(db, 'content/blogs'), data));
+        resetBlogForm(); btn.disabled = false;
+    });
+
     // Testimonials
     document.getElementById('form-testimonial').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -817,7 +942,33 @@
         }).join('');
     });
 
-    // NEW: Case Studies List
+    // NEW: Daily Update Fetch
+    onValue(ref(db, 'content/dailyUpdate'), (s) => {
+        if(s.exists()) {
+            const d = s.val();
+            document.getElementById('duTitle').value = d.title || '';
+            document.getElementById('duMessage').value = d.message || '';
+        } else {
+            document.getElementById('duTitle').value = '';
+            document.getElementById('duMessage').value = '';
+        }
+    });
+
+    // NEW: Blogs List
+    onValue(ref(db, 'content/blogs'), (s) => render('blog-list-container', s.val(), (key, v) => `
+        <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col group">
+            <img src="${v.thumbnailURL || 'https://placehold.co/600x400/e2e8f0/e2e8f0'}" class="w-full h-32 object-cover">
+            <div class="p-4 flex-grow">
+                <h4 class="font-bold text-sm text-slate-800 line-clamp-1">${v.title}</h4>
+                <p class="text-[11px] text-slate-500 font-bold uppercase tracking-wider mt-1">${v.date} • ${v.author}</p>
+            </div>
+            <div class="grid grid-cols-2 border-t border-slate-100">
+                <button onclick='editBlog("${key}", ${JSON.stringify(v).replace(/"/g, '&quot;')})' class="py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors border-r border-slate-100">Edit</button>
+                <button onclick="deleteItem('content/blogs/${key}')" class="py-2 text-xs font-bold text-red-600 hover:bg-red-50 transition-colors">Delete</button>
+            </div>
+        </div>`));
+
+    // Case Studies List
     onValue(ref(db, 'content/caseStudies'), (s) => render('case-study-list-container', s.val(), (key, v) => `
         <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex items-start justify-between gap-3 relative overflow-hidden">
             ${v.isPremium ? '<div class="absolute top-0 right-0 w-2 h-full bg-orange-400"></div>' : '<div class="absolute top-0 right-0 w-2 h-full bg-emerald-400"></div>'}
@@ -942,6 +1093,9 @@
     // --- FORM EDIT & RESET LOGIC ---
     const setupEdit = (tId, title, btnId, btnTxt, cancelId) => { document.getElementById(tId).textContent=title; document.getElementById(btnId).textContent=btnTxt; document.getElementById(cancelId).classList.remove('hidden'); }
     const resetForm = (fId, tId, title, btnId, btnTxt, cancelId) => { document.getElementById(fId).reset(); document.getElementById(tId).textContent=title; document.getElementById(btnId).textContent=btnTxt; document.getElementById(cancelId).classList.add('hidden'); const h = document.querySelector(`#${fId} input[type="hidden"]`); if(h) h.value=''; }
+
+    window.resetBlogForm = () => { resetForm('form-blog','blog-form-title',"Add New Blog",'btn-blog-text',"Publish Blog",'btn-blog-cancel'); document.getElementById('bCurrentImageURL').value=''; document.getElementById('bFileHelp').classList.add('hidden'); }
+    window.editBlog = (k, d) => { setupEdit('blog-form-title','Edit Blog','btn-blog-text','Update Blog','btn-blog-cancel'); document.getElementById('bEditKey').value=k; document.getElementById('bTitle').value=d.title; document.getElementById('bAuthor').value=d.author; document.getElementById('bDate').value=d.date; document.getElementById('bExcerpt').value=d.excerpt; document.getElementById('bContent').value=d.content; document.getElementById('bCurrentImageURL').value=d.thumbnailURL; document.getElementById('bFileHelp').classList.remove('hidden'); }
 
     window.resetCaseStudyForm = () => resetForm('form-case-study','cs-form-title',"Add New Case Study",'btn-cs-text',"Create Module",'btn-cs-cancel');
     window.editCaseStudy = (k, d) => { setupEdit('cs-form-title','Edit Module','btn-cs-text','Update Module','btn-cs-cancel'); document.getElementById('csEditKey').value=k; document.getElementById('csTitle').value=d.title; document.getElementById('csTopic').value=d.topic; document.getElementById('csPremium').checked=d.isPremium; }
