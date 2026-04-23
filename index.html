@@ -597,7 +597,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue, set, update, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, onValue, set, update, get, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
         import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
         const firebaseConfig = {
@@ -807,7 +807,7 @@
             }
         }
         
-        // --- DAILY UPDATE ---
+        // --- MULTIPLE DAILY UPDATES ---
         onValue(ref(db, 'content/dailyUpdate'), (snapshot) => {
             const section = document.getElementById('daily-update-section');
             if (snapshot.exists()) {
@@ -823,11 +823,9 @@
                 `;
                 
                 Object.entries(data).forEach(([key, item]) => {
-                    if (key === 'title' || key === 'message') return; 
-                    
-                    if (typeof item === 'object') {
+                    if (typeof item === 'object' && item !== null) {
                         html += `
-                        <div onclick="openUpdateDetail('${key}')" class="min-w-[220px] w-[220px] bg-gradient-to-br from-primary to-[#39448e] text-white border border-primary/50 rounded-2xl p-4 shadow-md hover:-translate-y-1 transition-transform cursor-pointer shrink-0 flex flex-col relative overflow-hidden">
+                        <div onclick="openUpdateDetail('${key}')" class="min-w-[240px] w-[240px] bg-gradient-to-br from-primary to-[#39448e] text-white border border-primary/50 rounded-2xl p-4 shadow-md hover:-translate-y-1 transition-transform cursor-pointer shrink-0 flex flex-col relative overflow-hidden">
                             <div class="absolute top-0 right-0 w-16 h-16 bg-white/5 rounded-bl-full"></div>
                             <div class="flex items-center gap-2 mb-3">
                                 <div class="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center text-secondary">
@@ -844,7 +842,8 @@
                     }
                 });
                 
-                if (data.title && data.message && Object.keys(data).filter(k => typeof data[k] === 'object').length === 0) {
+                // Fallback for previous single-update string format compatibility
+                if (data.title && data.message && typeof data.title === 'string') {
                     html += `
                         <div onclick="openSingleUpdateDetail()" class="min-w-[240px] w-[240px] bg-gradient-to-br from-primary to-[#39448e] text-white border border-primary/50 rounded-2xl p-4 shadow-md hover:-translate-y-1 transition-transform cursor-pointer shrink-0 flex flex-col relative overflow-hidden">
                             <div class="absolute top-0 right-0 w-16 h-16 bg-white/5 rounded-bl-full"></div>
@@ -885,7 +884,7 @@
             }
         };
 
-        // --- BLOGS ---
+        // --- BLOGS WITH CLICK TRACKING ---
         onValue(ref(db, 'content/blogs'), (s) => {
             const container = document.getElementById('home-blog-posts');
             if (s.exists()) {
@@ -899,7 +898,9 @@
                         <div class="p-4 flex flex-col flex-grow">
                             <h4 class="font-bold text-primary font-headline text-base mb-2 line-clamp-2">${post.title}</h4>
                             <p class="text-xs text-slate-500 line-clamp-3 mb-4">${post.excerpt}</p>
-                            <button onclick="showBlogDetails('${key}')" class="mt-auto self-start bg-secondary text-primary font-extrabold py-2 px-4 rounded-lg text-xs">Read More</button>
+                            <button onclick="openBlogLink('${key}', '${post.content || post.link || '#'}')" class="mt-auto self-start bg-secondary text-primary font-extrabold py-2 px-4 rounded-lg text-xs flex items-center gap-1">
+                                Read Article <span class="material-symbols-outlined text-[14px]">open_in_new</span>
+                            </button>
                         </div>
                     </div>
                     `;
@@ -910,26 +911,31 @@
             }
         });
 
-        window.showBlogDetails = function(blogKey) {
-            get(ref(db, `content/blogs/${blogKey}`)).then((snapshot) => {
-                if (snapshot.exists()) {
-                    const post = snapshot.val();
-                    const contentContainer = document.getElementById('blog-detail-content');
-                    contentContainer.innerHTML = `
-                        <img src="${post.thumbnailURL || 'https://placehold.co/1200x600/e2e8f0/e2e8f0'}" class="w-full aspect-video object-cover rounded-xl mb-6 border border-slate-200"/>
-                        <h2 class="text-3xl font-extrabold text-primary font-headline mb-3">${post.title}</h2>
-                        <div class="flex items-center gap-4 text-xs text-slate-500 font-medium mb-6 pb-4 border-b border-slate-200">
-                            <span>By: <strong class="text-slate-700">${post.author || 'Finzo Team'}</strong></span>
-                            <span>Date: <strong class="text-slate-700">${post.date || 'N/A'}</strong></span>
-                        </div>
-                        <div class="text-slate-700 leading-relaxed blog-content">${post.content || ''}</div>
-                    `;
-                    showPage('blogDetailPage');
-                } else {
-                    alert('Blog post not found.');
-                    showPage('homePage');
+        window.openBlogLink = function(blogKey, link) {
+            if (link && link !== '#') {
+                const today = new Date().toISOString().split('T')[0];
+                const clickRef = ref(db, `content/blogs/${blogKey}/clicks/${today}`);
+                
+                get(clickRef).then((snap) => {
+                    const currentCount = snap.exists() ? snap.val() : 0;
+                    update(ref(db, `content/blogs/${blogKey}/clicks`), {
+                        [today]: currentCount + 1
+                    });
+                });
+
+                // Convert link string if it lacks http/https
+                let finalUrl = link;
+                if (!/^https?:\/\//i.test(finalUrl)) {
+                    finalUrl = 'https://' + finalUrl;
                 }
-            });
+                window.open(finalUrl, '_blank');
+            } else {
+                alert("Link not available for this post.");
+            }
+        };
+
+        window.showBlogDetails = function(blogKey) {
+            // Deprecated function left intentionally blank to not delete original functions requested.
         }
 
 
@@ -1086,7 +1092,7 @@
             document.getElementById('cs-detail-container').innerHTML = headerHtml + contentHtml;
         }
 
-        // --- DYNAMIC MCQS (Admin Panel Connected) ---
+        // --- DYNAMIC MCQS WITH RESULTS SUBMISSION ---
         onValue(ref(db, 'content/mcqs'), (snapshot) => {
             const container = document.getElementById('mcq-bundles-dynamic-container');
             if(snapshot.exists()) {
@@ -1113,12 +1119,16 @@
         window.currentQuizQuestions = [];
         window.currentQIndex = 0;
         window.currentQuizTitle = "";
+        window.currentBundleKey = "";
+        window.currentScore = 0;
 
         window.startDynamicQuiz = function(bundleKey, bundleTitle) {
             get(ref(db, `content/mcqQuestions/${bundleKey}`)).then((snapshot) => {
                 if(snapshot.exists()) {
                     window.currentQuizQuestions = Object.values(snapshot.val());
                     window.currentQIndex = 0;
+                    window.currentScore = 0;
+                    window.currentBundleKey = bundleKey;
                     window.currentQuizTitle = bundleTitle;
                     window.showPage('mcqQuizPage');
                     renderDynamicQuestion();
@@ -1142,18 +1152,30 @@
 
             const qData = window.currentQuizQuestions[window.currentQIndex];
             if(!qData) {
+                // Submit Result to Firebase Profile
+                const mobile = localStorage.getItem('userMobile');
+                if (mobile && window.currentQuizQuestions.length > 0) {
+                    const resultData = {
+                        title: window.currentQuizTitle,
+                        score: window.currentScore,
+                        total: window.currentQuizQuestions.length,
+                        date: new Date().toISOString()
+                    };
+                    push(ref(db, `users/${mobile}/mcqResults`), resultData);
+                }
+
                 document.getElementById('quiz-player-container').innerHTML = `
-                    <div class="text-center py-10">
-                        <span class="material-symbols-outlined text-green-500 text-6xl mb-2">task_alt</span>
-                        <h3 class="text-2xl font-bold font-headline text-primary mb-1">Quiz Completed!</h3>
-                        <p class="text-slate-500 text-sm">You have answered all available questions.</p>
-                        <button onclick="showPage('mcqPage')" class="mt-6 bg-primary text-white font-bold py-2 px-6 rounded-lg">Return to Modules</button>
+                    <div class="text-center py-10 animate-fade-in-up">
+                        <span class="material-symbols-outlined text-emerald-500 text-6xl mb-4 bg-emerald-50 rounded-full p-4 border-4 border-emerald-100">task_alt</span>
+                        <h3 class="text-2xl font-bold font-headline text-primary mb-2">Quiz Completed!</h3>
+                        <p class="text-slate-600 font-medium mb-6">You scored <strong class="text-emerald-600 text-lg">${window.currentScore}</strong> out of ${window.currentQuizQuestions.length}</p>
+                        <button onclick="showPage('mcqPage')" class="w-full bg-primary text-white font-extrabold py-3 px-6 rounded-xl shadow-lg hover:bg-primary/90 transition-all">Return to Modules</button>
                     </div>`;
                 return;
             }
 
             const optionsHtml = Object.entries(qData.options).map(([optKey, optText]) => {
-                return `<button onclick="nextDynamicQuestion()" class="w-full text-left p-4 rounded-xl border border-slate-200 hover:border-primary hover:bg-primary/5 transition-all text-sm font-medium text-slate-700">${optText}</button>`;
+                return `<button onclick="nextDynamicQuestion('${optKey}', '${qData.correctAnswer}')" class="w-full text-left p-4 rounded-xl border border-slate-200 hover:border-primary hover:bg-primary/5 transition-all text-sm font-medium text-slate-700">${optText}</button>`;
             }).join('');
 
             const html = `
@@ -1169,7 +1191,10 @@
             document.getElementById('quiz-player-container').innerHTML = html;
         }
 
-        window.nextDynamicQuestion = function() {
+        window.nextDynamicQuestion = function(selectedOpt, correctOpt) {
+            if(selectedOpt === correctOpt) {
+                window.currentScore++;
+            }
             window.currentQIndex++;
             renderDynamicQuestion();
         }
