@@ -1121,6 +1121,33 @@
         window.currentQuizTitle = "";
         window.currentBundleKey = "";
         window.currentScore = 0;
+        window.quizSkipped = 0;
+        window.quizIncorrect = 0;
+        window.quizAttempted = 0;
+        window.quizTimer = null;
+        window.quizTimeRemaining = 0;
+        window.userAnswers = []; 
+
+        window.startQuizTimer = function() {
+            if(window.quizTimer) clearInterval(window.quizTimer);
+            window.quizTimer = setInterval(() => {
+                window.quizTimeRemaining--;
+                updateTimerDisplay();
+                if(window.quizTimeRemaining <= 0) {
+                    clearInterval(window.quizTimer);
+                    window.finishQuiz(); 
+                }
+            }, 1000);
+        }
+
+        window.updateTimerDisplay = function() {
+            const el = document.getElementById('quiz-timer-display');
+            if(el) {
+                const m = Math.floor(window.quizTimeRemaining / 60).toString().padStart(2, '0');
+                const s = (window.quizTimeRemaining % 60).toString().padStart(2, '0');
+                el.innerText = `${m}:${s}`;
+            }
+        }
 
         window.startDynamicQuiz = function(bundleKey, bundleTitle) {
             get(ref(db, `content/mcqQuestions/${bundleKey}`)).then((snapshot) => {
@@ -1128,8 +1155,14 @@
                     window.currentQuizQuestions = Object.values(snapshot.val());
                     window.currentQIndex = 0;
                     window.currentScore = 0;
+                    window.quizSkipped = 0;
+                    window.quizIncorrect = 0;
+                    window.quizAttempted = 0;
+                    window.userAnswers = [];
                     window.currentBundleKey = bundleKey;
                     window.currentQuizTitle = bundleTitle;
+                    window.quizTimeRemaining = window.currentQuizQuestions.length * 60; 
+                    window.startQuizTimer();
                     window.showPage('mcqQuizPage');
                     renderDynamicQuestion();
                 } else {
@@ -1138,6 +1171,65 @@
             }).catch(error => {
                 alert("Error loading quiz data. Try again.");
             });
+        }
+
+        window.finishQuiz = function() {
+            if(window.quizTimer) clearInterval(window.quizTimer);
+
+            const mobile = localStorage.getItem('userMobile');
+            if (mobile && window.currentQuizQuestions.length > 0) {
+                const resultData = {
+                    title: window.currentQuizTitle,
+                    score: window.currentScore,
+                    total: window.currentQuizQuestions.length,
+                    attempted: window.quizAttempted,
+                    skipped: window.quizSkipped,
+                    incorrect: window.quizIncorrect,
+                    date: new Date().toISOString()
+                };
+                push(ref(db, `users/${mobile}/mcqResults`), resultData);
+            }
+
+            const total = window.currentQuizQuestions.length;
+            const accuracy = total > 0 ? Math.round((window.currentScore / total) * 100) : 0;
+
+            document.getElementById('quiz-player-container').innerHTML = `
+                <div class="text-center py-6 animate-fade-in-up">
+                    <span class="material-symbols-outlined text-emerald-500 text-6xl mb-2 bg-emerald-50 rounded-full p-4 border-4 border-emerald-100">workspace_premium</span>
+                    <h3 class="text-2xl font-bold font-headline text-primary mb-1">Quiz Completed!</h3>
+                    <p class="text-slate-500 text-sm mb-6">Here is your detailed performance report.</p>
+
+                    <div class="grid grid-cols-2 gap-4 mb-6 text-left">
+                        <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                            <div class="text-blue-500 text-xs font-bold uppercase tracking-wider mb-1">Total Score</div>
+                            <div class="text-2xl font-extrabold text-blue-900">${window.currentScore} <span class="text-sm font-medium text-blue-600">/ ${total}</span></div>
+                        </div>
+                        <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+                            <div class="text-indigo-500 text-xs font-bold uppercase tracking-wider mb-1">Accuracy</div>
+                            <div class="text-2xl font-extrabold text-indigo-900">${accuracy}%</div>
+                        </div>
+                        <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
+                            <div class="text-emerald-500 text-xs font-bold uppercase tracking-wider mb-1">Correct</div>
+                            <div class="text-2xl font-extrabold text-emerald-900">${window.currentScore}</div>
+                        </div>
+                        <div class="bg-red-50 p-4 rounded-xl border border-red-100">
+                            <div class="text-red-500 text-xs font-bold uppercase tracking-wider mb-1">Incorrect</div>
+                            <div class="text-2xl font-extrabold text-red-900">${window.quizIncorrect}</div>
+                        </div>
+                        <div class="bg-orange-50 p-4 rounded-xl border border-orange-100">
+                            <div class="text-orange-500 text-xs font-bold uppercase tracking-wider mb-1">Attempted</div>
+                            <div class="text-2xl font-extrabold text-orange-900">${window.quizAttempted}</div>
+                        </div>
+                        <div class="bg-slate-100 p-4 rounded-xl border border-slate-200">
+                            <div class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Skipped</div>
+                            <div class="text-2xl font-extrabold text-slate-900">${window.quizSkipped}</div>
+                        </div>
+                    </div>
+
+                    <button onclick="showPage('mcqPage')" class="w-full bg-primary text-white font-extrabold py-3.5 px-6 rounded-xl shadow-lg hover:bg-primary/90 transition-all flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">menu_book</span> Return to Modules
+                    </button>
+                </div>`;
         }
 
         window.renderDynamicQuestion = function() {
@@ -1152,25 +1244,7 @@
 
             const qData = window.currentQuizQuestions[window.currentQIndex];
             if(!qData) {
-                // Submit Result to Firebase Profile
-                const mobile = localStorage.getItem('userMobile');
-                if (mobile && window.currentQuizQuestions.length > 0) {
-                    const resultData = {
-                        title: window.currentQuizTitle,
-                        score: window.currentScore,
-                        total: window.currentQuizQuestions.length,
-                        date: new Date().toISOString()
-                    };
-                    push(ref(db, `users/${mobile}/mcqResults`), resultData);
-                }
-
-                document.getElementById('quiz-player-container').innerHTML = `
-                    <div class="text-center py-10 animate-fade-in-up">
-                        <span class="material-symbols-outlined text-emerald-500 text-6xl mb-4 bg-emerald-50 rounded-full p-4 border-4 border-emerald-100">task_alt</span>
-                        <h3 class="text-2xl font-bold font-headline text-primary mb-2">Quiz Completed!</h3>
-                        <p class="text-slate-600 font-medium mb-6">You scored <strong class="text-emerald-600 text-lg">${window.currentScore}</strong> out of ${window.currentQuizQuestions.length}</p>
-                        <button onclick="showPage('mcqPage')" class="w-full bg-primary text-white font-extrabold py-3 px-6 rounded-xl shadow-lg hover:bg-primary/90 transition-all">Return to Modules</button>
-                    </div>`;
+                window.finishQuiz();
                 return;
             }
 
@@ -1181,20 +1255,44 @@
             const html = `
                 <div class="flex justify-between items-center mb-4">
                     <span class="text-sm font-bold text-slate-400">Question ${window.currentQIndex + 1} of ${window.currentQuizQuestions.length}</span>
-                    <span class="bg-primary/10 text-primary text-xs font-bold px-2 py-1 rounded max-w-[120px] truncate">${window.currentQuizTitle}</span>
+                    <div class="flex items-center gap-2">
+                        <span class="bg-red-50 text-red-600 border border-red-200 text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">timer</span>
+                            <span id="quiz-timer-display">00:00</span>
+                        </span>
+                        <span class="bg-primary/10 text-primary text-xs font-bold px-2 py-1 rounded max-w-[120px] truncate">${window.currentQuizTitle}</span>
+                    </div>
                 </div>
-                <h3 class="text-lg font-bold text-slate-800 mb-6">${qData.question}</h3>
+                <h3 class="text-lg font-bold text-slate-800 mb-6 whitespace-pre-wrap">${qData.question}</h3>
                 <div class="space-y-3">
                     ${optionsHtml}
                 </div>
+                <div class="mt-6 flex justify-end">
+                    <button onclick="skipDynamicQuestion()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center gap-1">
+                        Skip Question <span class="material-symbols-outlined text-[16px]">skip_next</span>
+                    </button>
+                </div>
             `;
             document.getElementById('quiz-player-container').innerHTML = html;
+            setTimeout(() => window.updateTimerDisplay(), 0);
         }
 
         window.nextDynamicQuestion = function(selectedOpt, correctOpt) {
+            window.quizAttempted++;
             if(selectedOpt === correctOpt) {
                 window.currentScore++;
+                window.userAnswers.push({q: window.currentQIndex, status: 'correct'});
+            } else {
+                window.quizIncorrect++;
+                window.userAnswers.push({q: window.currentQIndex, status: 'incorrect'});
             }
+            window.currentQIndex++;
+            renderDynamicQuestion();
+        }
+
+        window.skipDynamicQuestion = function() {
+            window.quizSkipped++;
+            window.userAnswers.push({q: window.currentQIndex, status: 'skipped'});
             window.currentQIndex++;
             renderDynamicQuestion();
         }
