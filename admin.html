@@ -26,8 +26,8 @@
         .sidebar-link.active { background: linear-gradient(90deg, rgba(79,70,229,0.1) 0%, rgba(79,70,229,0.05) 100%); color: #4f46e5; border-right: 4px solid #4f46e5; font-weight: 700; }
         .sidebar-link.active .material-symbols-outlined { color: #4f46e5; }
         
-        /* Modal Style for Image Zoom */
-        #image-modal { transition: opacity 0.3s ease; backdrop-filter: blur(5px); }
+        /* Modal Style */
+        .admin-modal { transition: opacity 0.3s ease; backdrop-filter: blur(5px); }
         
         /* Glassmorphism Cards */
         .glass-card { background: white; border: 1px solid rgba(226, 232, 240, 0.8); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03); border-radius: 1.25rem; }
@@ -36,11 +36,79 @@
 <body class="text-slate-800 flex h-screen overflow-hidden">
 
 <!-- Image Preview Modal -->
-<div id="image-modal" class="fixed inset-0 z-[999] hidden bg-slate-900/90 flex items-center justify-center p-4">
+<div id="image-modal" class="admin-modal fixed inset-0 z-[999] hidden bg-slate-900/90 flex items-center justify-center p-4">
     <button onclick="closeImageModal()" class="absolute top-6 right-6 text-white bg-white/10 hover:bg-white/25 rounded-full p-2 transition-all backdrop-blur-md">
         <span class="material-symbols-outlined text-3xl">close</span>
     </button>
     <img id="modal-image" src="" class="max-w-full max-h-[90vh] rounded-xl shadow-2xl object-contain border-4 border-white/10">
+</div>
+
+<!-- User Management Modal -->
+<div id="user-manage-modal" class="admin-modal fixed inset-0 z-[999] hidden bg-slate-900/80 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl animate-fade-in-up">
+        <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+            <h3 class="font-extrabold text-xl text-slate-800 flex items-center gap-2">
+                <span class="material-symbols-outlined text-indigo-600">manage_accounts</span> User Activity & Access
+            </h3>
+            <button onclick="closeUserModal()" class="text-slate-400 hover:text-slate-700 bg-slate-200 hover:bg-slate-300 rounded-full w-8 h-8 flex items-center justify-center transition-all"><span class="material-symbols-outlined text-sm">close</span></button>
+        </div>
+        <div class="p-6 overflow-y-auto flex-1 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Left: Premium Control -->
+            <div class="bg-indigo-50/50 p-5 rounded-2xl border border-indigo-100 h-fit">
+                <h4 class="font-bold text-sm text-indigo-800 mb-4 uppercase tracking-wider flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">verified_user</span> Grant Premium Features</h4>
+                <div class="space-y-3">
+                    <label class="flex items-center gap-3 p-3.5 bg-white border border-slate-200 shadow-sm rounded-xl cursor-pointer hover:border-indigo-300 transition-colors">
+                        <input type="checkbox" id="uAccessCase" class="w-5 h-5 rounded text-indigo-600 border-slate-300 focus:ring-indigo-500">
+                        <span class="font-bold text-sm text-slate-700 flex-1">Case Study Pro</span>
+                        <span class="material-symbols-outlined text-slate-300 text-lg">auto_stories</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3.5 bg-white border border-slate-200 shadow-sm rounded-xl cursor-pointer hover:border-indigo-300 transition-colors">
+                        <input type="checkbox" id="uAccessMcq" class="w-5 h-5 rounded text-indigo-600 border-slate-300 focus:ring-indigo-500">
+                        <span class="font-bold text-sm text-slate-700 flex-1">MCQ Test Pro</span>
+                        <span class="material-symbols-outlined text-slate-300 text-lg">quiz</span>
+                    </label>
+                    <div class="p-3.5 bg-white border border-slate-200 shadow-sm rounded-xl">
+                        <label class="font-bold text-sm text-slate-700 mb-2 flex items-center justify-between">
+                            Expert Chat Access <span class="material-symbols-outlined text-slate-300 text-lg">forum</span>
+                        </label>
+                        <select id="uAccessChat" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+                            <option value="0">Free User (Limited)</option>
+                            <option value="7">Premium (7 Days)</option>
+                            <option value="30">Premium (30 Days)</option>
+                            <option value="365">Premium (1 Year)</option>
+                        </select>
+                        <p id="uChatStatus" class="text-[10px] text-emerald-600 font-bold mt-2 hidden"></p>
+                    </div>
+                    <button onclick="saveUserAccess()" class="w-full bg-indigo-600 text-white font-extrabold py-3.5 rounded-xl hover:bg-indigo-700 mt-4 shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2">
+                        Update Access <span class="material-symbols-outlined text-[18px]">save</span>
+                    </button>
+                    <input type="hidden" id="manageUserId">
+                </div>
+            </div>
+            <!-- Right: Activity (MCQ) -->
+            <div>
+                <h4 class="font-bold text-sm text-emerald-600 mb-4 uppercase tracking-wider flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">query_stats</span> MCQ Results History</h4>
+                <div id="uMcqResultsList" class="space-y-3 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
+                    <!-- Dynamic MCQ Results -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Blog Clicks Stats Modal -->
+<div id="blog-stats-modal" class="admin-modal fixed inset-0 z-[999] hidden bg-slate-900/80 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-sm overflow-hidden flex flex-col shadow-2xl">
+        <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+            <h3 class="font-extrabold text-lg text-slate-800 flex items-center gap-2">
+                <span class="material-symbols-outlined text-indigo-600 text-[20px]">bar_chart</span> Click Statistics
+            </h3>
+            <button onclick="closeBlogStatsModal()" class="text-slate-400 hover:text-slate-700"><span class="material-symbols-outlined">close</span></button>
+        </div>
+        <div class="p-5">
+            <div id="blog-stats-container" class="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar"></div>
+        </div>
+    </div>
 </div>
 
 <!-- Sidebar -->
@@ -68,7 +136,6 @@
         <a href="#" onclick="showPage('page-courses')" class="sidebar-link flex items-center gap-3 px-6 py-3 text-slate-500 hover:bg-slate-50 font-semibold text-sm">
             <span class="material-symbols-outlined text-[20px]">school</span> Popular Courses
         </a>
-        <!-- NEW: Case Studies Menu -->
         <a href="#" onclick="showPage('page-case-studies')" class="sidebar-link flex items-center gap-3 px-6 py-3 text-slate-500 hover:bg-slate-50 font-semibold text-sm">
             <span class="material-symbols-outlined text-[20px]">auto_stories</span> Case Studies
         </a>
@@ -80,12 +147,11 @@
         </a>
 
         <p class="px-6 text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-6 mb-2">Website Content</p>
-        <!-- NEW: Daily Updates & Blogs Menu -->
         <a href="#" onclick="showPage('page-daily-update')" class="sidebar-link flex items-center gap-3 px-6 py-3 text-slate-500 hover:bg-slate-50 font-semibold text-sm">
-            <span class="material-symbols-outlined text-[20px]">campaign</span> Daily Update
+            <span class="material-symbols-outlined text-[20px]">campaign</span> Daily Updates
         </a>
         <a href="#" onclick="showPage('page-blogs')" class="sidebar-link flex items-center gap-3 px-6 py-3 text-slate-500 hover:bg-slate-50 font-semibold text-sm">
-            <span class="material-symbols-outlined text-[20px]">article</span> Blog Posts
+            <span class="material-symbols-outlined text-[20px]">article</span> Blog Links
         </a>
         <a href="#" onclick="showPage('page-slider')" class="sidebar-link flex items-center gap-3 px-6 py-3 text-slate-500 hover:bg-slate-50 font-semibold text-sm">
             <span class="material-symbols-outlined text-[20px]">view_carousel</span> Hero Slider
@@ -190,7 +256,7 @@
             <div class="flex justify-between items-center mb-6">
                 <div>
                     <h2 class="text-2xl font-extrabold text-slate-900">User Registrations</h2>
-                    <p class="text-sm text-slate-500 mt-1">Manage users and see their premium packages.</p>
+                    <p class="text-sm text-slate-500 mt-1">Manage users, view activity, and grant premium access.</p>
                 </div>
                 <div class="bg-indigo-50 text-indigo-700 px-4 py-2 rounded-xl text-sm font-bold border border-indigo-100 shadow-sm">
                     Total Leads: <span id="user-count" class="text-lg ml-1">0</span>
@@ -198,7 +264,7 @@
             </div>
             <div class="glass-card overflow-hidden">
                 <div class="overflow-x-auto w-full pb-4">
-                    <table class="w-full text-left border-collapse min-w-[800px]">
+                    <table class="w-full text-left border-collapse min-w-[900px]">
                         <thead class="bg-slate-50/80 border-b border-slate-200 backdrop-blur-sm">
                             <tr>
                                 <th class="px-6 py-4 text-xs font-extrabold uppercase tracking-wider text-slate-500">User Profile</th>
@@ -220,30 +286,37 @@
             </div>
         </div>
 
-        <!-- NEW PAGE: Daily Update -->
+        <!-- MULTIPLE DAILY UPDATES PAGE -->
         <div id="page-daily-update" class="page">
-            <h2 class="text-2xl font-extrabold text-slate-900 mb-6 tracking-tight">Student Daily Updates (Update Yourself)</h2>
-            <div class="glass-card p-6 max-w-2xl">
-                <h3 class="font-extrabold text-lg mb-2 text-slate-800">Post a new update</h3>
-                <p class="text-xs text-slate-500 mb-6">This message will appear on the top of the user home page.</p>
-                <form id="form-daily-update" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Update Heading / Title</label>
-                        <input type="text" id="duTitle" placeholder="e.g., Exam Strategy 2024 or Syllabus Change" required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-sm text-slate-800">
+            <h2 class="text-2xl font-extrabold text-slate-900 mb-6 tracking-tight">Manage Daily Updates</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-1 glass-card p-6 h-fit sticky top-6">
+                    <h3 class="font-extrabold text-lg mb-2 text-slate-800">Post a new update</h3>
+                    <p class="text-xs text-slate-500 mb-6">This will be added to the horizontal scroll list.</p>
+                    <form id="form-daily-update" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Update Heading / Title</label>
+                            <input type="text" id="duTitle" placeholder="e.g., Exam Strategy 2024" required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-sm text-slate-800">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Short Message</label>
+                            <textarea id="duMessage" rows="4" placeholder="Brief announcement detail..." required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-sm text-slate-800"></textarea>
+                        </div>
+                        <button type="submit" id="btn-daily-update" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/20">Publish Update Live</button>
+                    </form>
+                </div>
+                <div class="lg:col-span-2 glass-card p-6">
+                    <h3 class="font-extrabold text-lg mb-4 text-slate-800">Live Updates</h3>
+                    <div id="daily-update-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Dynamic Updates -->
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Full Message</label>
-                        <textarea id="duMessage" rows="5" placeholder="Write your daily message or important information here..." required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-sm text-slate-800"></textarea>
-                    </div>
-                    <button type="submit" id="btn-daily-update" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/20">Publish Update Live</button>
-                    <button type="button" onclick="deleteItem('content/dailyUpdate')" class="w-full bg-red-50 hover:bg-red-100 text-red-600 font-bold py-3 rounded-xl transition-all mt-2">Remove Current Update</button>
-                </form>
+                </div>
             </div>
         </div>
 
-        <!-- NEW PAGE: Blogs -->
+        <!-- BLOGS PAGE -->
         <div id="page-blogs" class="page">
-            <h2 class="text-2xl font-extrabold text-slate-900 mb-6 tracking-tight">Manage Blog Posts</h2>
+            <h2 class="text-2xl font-extrabold text-slate-900 mb-6 tracking-tight">Manage Blog Links</h2>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-1 glass-card p-6 h-fit sticky top-6">
                     <h3 id="blog-form-title" class="font-extrabold text-lg mb-4 text-slate-800">Add New Blog</h3>
@@ -269,8 +342,8 @@
                             <textarea id="bExcerpt" rows="2" placeholder="Brief summary for home page..." required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm"></textarea>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Full Content</label>
-                            <textarea id="bContent" rows="6" placeholder="Write full blog here..." required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm"></textarea>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">External Link (Article URL)</label>
+                            <input type="url" id="bLink" placeholder="https://..." required class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Thumbnail Image</label>
@@ -292,7 +365,7 @@
             </div>
         </div>
 
-        <!-- NEW PAGE: Case Studies -->
+        <!-- Case Studies Page -->
         <div id="page-case-studies" class="page">
             <h2 class="text-2xl font-extrabold text-slate-900 mb-6 tracking-tight">Manage Case Studies</h2>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -636,6 +709,7 @@
 
     // --- GLOBAL STATE ---
     let currentMcqBundleKey = null;
+    let allUsersData = {};
 
     // View Image Modal
     window.openImageModal = (url) => {
@@ -646,6 +720,98 @@
     window.closeImageModal = () => {
         document.getElementById('image-modal').classList.add('hidden');
     };
+
+    // View Blog Stats Modal
+    window.viewBlogStats = (clicksObj) => {
+        const container = document.getElementById('blog-stats-container');
+        if(!clicksObj) {
+            container.innerHTML = '<p class="text-sm text-slate-500">No clicks recorded yet.</p>';
+        } else {
+            let html = Object.entries(clicksObj).sort().reverse().map(([date, count]) => `
+                <div class="flex justify-between items-center bg-slate-50 border border-slate-200 p-3 rounded-lg mb-2">
+                    <span class="font-bold text-sm text-slate-700">${date}</span>
+                    <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2 py-1 rounded shadow-sm">${count} Clicks</span>
+                </div>
+            `).join('');
+            container.innerHTML = html;
+        }
+        document.getElementById('blog-stats-modal').classList.remove('hidden');
+    }
+    window.closeBlogStatsModal = () => {
+        document.getElementById('blog-stats-modal').classList.add('hidden');
+    }
+
+    // User Manage Modal logic
+    window.openUserModal = (mobile) => {
+        const user = allUsersData[mobile];
+        if(!user) return;
+        
+        document.getElementById('manageUserId').value = mobile;
+        
+        // Premium Packages setup
+        document.getElementById('uAccessCase').checked = user.unlockedPackages?.case_study === true;
+        document.getElementById('uAccessMcq').checked = user.unlockedPackages?.mcq_test === true;
+        
+        // Chat Expiry Setup
+        const chatStatus = document.getElementById('uChatStatus');
+        const chatSelect = document.getElementById('uAccessChat');
+        chatSelect.value = "0"; // Default
+        if (user.premiumChatEndTime && user.premiumChatEndTime > Date.now()) {
+            const date = new Date(user.premiumChatEndTime).toLocaleDateString();
+            chatStatus.textContent = `Current Active Plan Expires: ${date}`;
+            chatStatus.classList.remove('hidden');
+        } else {
+            chatStatus.classList.add('hidden');
+        }
+
+        // MCQ Results Setup
+        const resultsContainer = document.getElementById('uMcqResultsList');
+        if(user.mcqResults) {
+            const resultsHtml = Object.values(user.mcqResults).reverse().map(r => `
+                <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl flex justify-between items-center">
+                    <div>
+                        <h5 class="font-bold text-sm text-slate-800">${r.title}</h5>
+                        <p class="text-[10px] text-slate-400 mt-0.5">${new Date(r.date).toLocaleString()}</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="bg-emerald-100 text-emerald-700 font-extrabold text-sm px-3 py-1.5 rounded-lg shadow-sm">${r.score} / ${r.total}</span>
+                    </div>
+                </div>
+            `).join('');
+            resultsContainer.innerHTML = resultsHtml;
+        } else {
+            resultsContainer.innerHTML = '<p class="text-sm text-slate-500 py-4 text-center bg-slate-50 rounded-xl border border-slate-200">No MCQ tests taken yet.</p>';
+        }
+
+        document.getElementById('user-manage-modal').classList.remove('hidden');
+    };
+
+    window.closeUserModal = () => {
+        document.getElementById('user-manage-modal').classList.add('hidden');
+    };
+
+    window.saveUserAccess = () => {
+        const mobile = document.getElementById('manageUserId').value;
+        const caseStudy = document.getElementById('uAccessCase').checked;
+        const mcqTest = document.getElementById('uAccessMcq').checked;
+        const chatDays = parseInt(document.getElementById('uAccessChat').value);
+        
+        let updates = {};
+        updates['unlockedPackages/case_study'] = caseStudy;
+        updates['unlockedPackages/mcq_test'] = mcqTest;
+        
+        if(chatDays > 0) {
+            const currentExpiry = allUsersData[mobile]?.premiumChatEndTime || Date.now();
+            const baseTime = currentExpiry > Date.now() ? currentExpiry : Date.now();
+            updates['premiumChatEndTime'] = baseTime + (chatDays * 24 * 60 * 60 * 1000);
+        }
+
+        update(ref(db, `users/${mobile}`), updates).then(() => {
+            alert('User Access Updated Successfully!');
+            closeUserModal();
+        }).catch(e => alert("Error: " + e.message));
+    }
+
 
     // ImgBB Upload
     async function uploadImageToImgBB(file) {
@@ -686,7 +852,7 @@
             'page-users': 'User Database',
             'page-case-studies': 'Case Studies Management',
             'page-daily-update': 'Daily Update Management',
-            'page-blogs': 'Blog Posts Management',
+            'page-blogs': 'Blog Links Management',
             'page-slider': 'Hero Slider Management',
             'page-testimonials': 'Topper Reviews',
             'page-courses': 'Course Directory',
@@ -715,7 +881,7 @@
         btn.disabled = false; btn.innerHTML = 'Upload Banner';
     });
 
-    // NEW: Case Studies
+    // Case Studies
     document.getElementById('form-case-study').addEventListener('submit', async (e) => {
         e.preventDefault();
         const editKey = document.getElementById('csEditKey').value;
@@ -729,21 +895,22 @@
         resetCaseStudyForm();
     });
     
-    // NEW: Daily Update
+    // MULTIPLE Daily Updates
     document.getElementById('form-daily-update').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('btn-daily-update');
         btn.disabled = true; btn.textContent = 'Publishing...';
         const data = {
             title: document.getElementById('duTitle').value,
-            message: document.getElementById('duMessage').value
+            message: document.getElementById('duMessage').value,
+            timestamp: Date.now()
         };
-        await set(ref(db, 'content/dailyUpdate'), data);
-        alert('Daily Update Published Successfully!');
+        await push(ref(db, 'content/dailyUpdate'), data);
+        document.getElementById('form-daily-update').reset();
         btn.disabled = false; btn.textContent = 'Publish Update Live';
     });
 
-    // NEW: Blogs
+    // Blogs (Links)
     document.getElementById('form-blog').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('btn-blog');
@@ -764,13 +931,17 @@
             author: document.getElementById('bAuthor').value, 
             date: document.getElementById('bDate').value, 
             excerpt: document.getElementById('bExcerpt').value, 
-            content: document.getElementById('bContent').value, 
+            link: document.getElementById('bLink').value, 
             thumbnailURL: imageUrl || '' 
         };
         
         const path = 'content/blogs' + (editKey ? `/${editKey}` : '');
-        await (editKey ? set(ref(db, path), data) : push(ref(db, 'content/blogs'), data));
-        resetBlogForm(); btn.disabled = false;
+        // Keep existing clicks if editing
+        if(editKey) {
+            update(ref(db, path), data).then(()=> { resetBlogForm(); btn.disabled = false; });
+        } else {
+            push(ref(db, 'content/blogs'), data).then(()=> { resetBlogForm(); btn.disabled = false; });
+        }
     });
 
     // Testimonials
@@ -902,18 +1073,18 @@
         document.getElementById('stat-testimonials').textContent = Object.keys(d.testimonials || {}).length;
     });
 
-    // Users List with Premium Badges
+    // Users List with Manage Button
     onValue(ref(db, 'users'), (s) => {
-        const users = s.val();
+        allUsersData = s.val() || {};
         const container = document.getElementById('user-list-container');
         const emptyState = document.getElementById('user-empty-state');
-        if (!users) { container.innerHTML = ""; emptyState.classList.remove('hidden'); document.getElementById('user-count').textContent = "0"; document.getElementById('stat-users').textContent = "0"; return; }
+        if (Object.keys(allUsersData).length === 0) { container.innerHTML = ""; emptyState.classList.remove('hidden'); document.getElementById('user-count').textContent = "0"; document.getElementById('stat-users').textContent = "0"; return; }
         
         emptyState.classList.add('hidden');
-        document.getElementById('user-count').textContent = Object.keys(users).length;
-        document.getElementById('stat-users').textContent = Object.keys(users).length;
+        document.getElementById('user-count').textContent = Object.keys(allUsersData).length;
+        document.getElementById('stat-users').textContent = Object.keys(allUsersData).length;
 
-        container.innerHTML = Object.entries(users).map(([key, v]) => {
+        container.innerHTML = Object.entries(allUsersData).map(([key, v]) => {
             const pic = v.pic || v.profilePicURL || `https://ui-avatars.com/api/?name=${v.name}&background=random`;
             let badges = '';
             if (v.unlockedPackages?.case_study) badges += '<span class="inline-block bg-orange-100 text-orange-700 text-[10px] px-2.5 py-1 rounded-md font-bold mr-1 mb-1 shadow-sm">Case Study Pro</span>';
@@ -935,38 +1106,55 @@
                 </td>
                 <td class="px-6 py-4 text-xs text-slate-600 max-w-[150px] truncate">${v.address || 'N/A'}</td>
                 <td class="px-6 py-4"><div class="flex flex-wrap max-w-[180px]">${badges}</div></td>
-                <td class="px-6 py-4 text-right">
-                    <button onclick="deleteItem('users/${key}')" class="text-slate-300 hover:text-red-500 hover:bg-red-50 p-2 rounded-lg transition-all opacity-0 group-hover:opacity-100"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+                <td class="px-6 py-4 text-right flex gap-2 justify-end">
+                    <button onclick="openUserModal('${key}')" class="text-indigo-600 hover:bg-indigo-50 p-2 rounded-lg transition-all font-bold text-xs flex items-center gap-1 border border-indigo-100"><span class="material-symbols-outlined text-[16px]">edit</span> Manage</button>
+                    <button onclick="deleteItem('users/${key}')" class="text-slate-300 hover:text-red-500 hover:bg-red-50 p-2 rounded-lg transition-all"><span class="material-symbols-outlined text-[20px]">delete</span></button>
                 </td>
             </tr>`;
         }).join('');
     });
 
-    // NEW: Daily Update Fetch
-    onValue(ref(db, 'content/dailyUpdate'), (s) => {
-        if(s.exists()) {
-            const d = s.val();
-            document.getElementById('duTitle').value = d.title || '';
-            document.getElementById('duMessage').value = d.message || '';
-        } else {
-            document.getElementById('duTitle').value = '';
-            document.getElementById('duMessage').value = '';
-        }
-    });
+    // Multiple Daily Updates List
+    onValue(ref(db, 'content/dailyUpdate'), (s) => render('daily-update-list-container', s.val(), (key, v) => {
+        if(typeof v !== 'object' || v === null) return ''; // fallback protection
+        return `
+        <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-10 h-10 bg-indigo-50 rounded-bl-full"></div>
+            <div>
+                <h4 class="font-bold text-slate-800 text-sm line-clamp-1 pr-6">${v.title}</h4>
+                <p class="text-xs text-slate-500 line-clamp-2 mt-1">${v.message}</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 text-right">
+                <button onclick="deleteItem('content/dailyUpdate/${key}')" class="text-xs font-bold text-red-600 px-3 py-1.5 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-end gap-1 ml-auto"><span class="material-symbols-outlined text-[14px]">delete</span> Delete</button>
+            </div>
+        </div>`;
+    }));
 
-    // NEW: Blogs List
-    onValue(ref(db, 'content/blogs'), (s) => render('blog-list-container', s.val(), (key, v) => `
+    // Blogs List (Link Clicks display)
+    onValue(ref(db, 'content/blogs'), (s) => render('blog-list-container', s.val(), (key, v) => {
+        let clicksHtml = '';
+        let totalClicks = 0;
+        if(v.clicks) {
+            Object.values(v.clicks).forEach(count => totalClicks += count);
+            clicksHtml = `<button onclick='viewBlogStats(${JSON.stringify(v.clicks)})' class="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-1 rounded font-bold border border-indigo-100 hover:bg-indigo-100 mt-2 flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">ads_click</span> Total Clicks: ${totalClicks}</button>`;
+        } else {
+            clicksHtml = `<span class="text-[10px] text-slate-400 font-medium flex items-center gap-1 mt-2"><span class="material-symbols-outlined text-[12px]">ads_click</span> 0 Clicks</span>`;
+        }
+
+        return `
         <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col group">
             <img src="${v.thumbnailURL || 'https://placehold.co/600x400/e2e8f0/e2e8f0'}" class="w-full h-32 object-cover">
             <div class="p-4 flex-grow">
                 <h4 class="font-bold text-sm text-slate-800 line-clamp-1">${v.title}</h4>
                 <p class="text-[11px] text-slate-500 font-bold uppercase tracking-wider mt-1">${v.date} • ${v.author}</p>
+                ${clicksHtml}
             </div>
             <div class="grid grid-cols-2 border-t border-slate-100">
                 <button onclick='editBlog("${key}", ${JSON.stringify(v).replace(/"/g, '&quot;')})' class="py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors border-r border-slate-100">Edit</button>
                 <button onclick="deleteItem('content/blogs/${key}')" class="py-2 text-xs font-bold text-red-600 hover:bg-red-50 transition-colors">Delete</button>
             </div>
-        </div>`));
+        </div>`;
+    }));
 
     // Case Studies List
     onValue(ref(db, 'content/caseStudies'), (s) => render('case-study-list-container', s.val(), (key, v) => `
@@ -1095,7 +1283,7 @@
     const resetForm = (fId, tId, title, btnId, btnTxt, cancelId) => { document.getElementById(fId).reset(); document.getElementById(tId).textContent=title; document.getElementById(btnId).textContent=btnTxt; document.getElementById(cancelId).classList.add('hidden'); const h = document.querySelector(`#${fId} input[type="hidden"]`); if(h) h.value=''; }
 
     window.resetBlogForm = () => { resetForm('form-blog','blog-form-title',"Add New Blog",'btn-blog-text',"Publish Blog",'btn-blog-cancel'); document.getElementById('bCurrentImageURL').value=''; document.getElementById('bFileHelp').classList.add('hidden'); }
-    window.editBlog = (k, d) => { setupEdit('blog-form-title','Edit Blog','btn-blog-text','Update Blog','btn-blog-cancel'); document.getElementById('bEditKey').value=k; document.getElementById('bTitle').value=d.title; document.getElementById('bAuthor').value=d.author; document.getElementById('bDate').value=d.date; document.getElementById('bExcerpt').value=d.excerpt; document.getElementById('bContent').value=d.content; document.getElementById('bCurrentImageURL').value=d.thumbnailURL; document.getElementById('bFileHelp').classList.remove('hidden'); }
+    window.editBlog = (k, d) => { setupEdit('blog-form-title','Edit Blog','btn-blog-text','Update Blog','btn-blog-cancel'); document.getElementById('bEditKey').value=k; document.getElementById('bTitle').value=d.title; document.getElementById('bAuthor').value=d.author; document.getElementById('bDate').value=d.date; document.getElementById('bExcerpt').value=d.excerpt; document.getElementById('bLink').value=d.link; document.getElementById('bCurrentImageURL').value=d.thumbnailURL; document.getElementById('bFileHelp').classList.remove('hidden'); }
 
     window.resetCaseStudyForm = () => resetForm('form-case-study','cs-form-title',"Add New Case Study",'btn-cs-text',"Create Module",'btn-cs-cancel');
     window.editCaseStudy = (k, d) => { setupEdit('cs-form-title','Edit Module','btn-cs-text','Update Module','btn-cs-cancel'); document.getElementById('csEditKey').value=k; document.getElementById('csTitle').value=d.title; document.getElementById('csTopic').value=d.topic; document.getElementById('csPremium').checked=d.isPremium; }
